@@ -1,0 +1,231 @@
+<div class="layout">
+<div class="dashboard-container">
+
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h1>Dashboard Overview</h1>
+
+    <button class="refresh-btn" (click)="refreshDashboard()" [disabled]="loading">
+      <svg *ngIf="!loading" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+      </svg>
+      <span *ngIf="loading">Loading...</span>
+      <span *ngIf="!loading">Refresh</span>
+    </button>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading dashboard data...</p>
+  </div>
+
+  <div *ngIf="!loading">
+
+    <!-- ===================== STATS ===================== -->
+    <div class="stats-grid">
+
+      <!-- Total POs -->
+      <div class="stat-card clickable" (click)="navigateToPO()" style="--card-color:#3b82f6">
+        <div class="stat-icon" style="background:#3b82f6">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+               stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+        </div>
+        <div class="stat-details">
+          <div class="stat-label">Total POs</div>
+          <div class="stat-value">{{ stats.totalPOs }}</div>
+          <div class="stat-meta">{{ stats.pendingPOs }} Pending</div>
+        </div>
+      </div>
+
+      <!-- Total LOIs -->
+      <div class="stat-card clickable" (click)="navigateToLOI()" style="--card-color:#8b5cf6">
+        <div class="stat-icon" style="background:#8b5cf6">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+               stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+        </div>
+        <div class="stat-details">
+          <div class="stat-label">Total LOIs</div>
+          <div class="stat-value">{{ stats.totalLOIs }}</div>
+          <div class="stat-meta">{{ stats.pendingLOIs }} Pending</div>
+        </div>
+      </div>
+
+      <!-- Stock Items -->
+      <div class="stat-card clickable" (click)="navigateToStock()" style="--card-color:#10b981">
+        <div class="stat-icon" style="background:#10b981">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+               stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div class="stat-details">
+          <div class="stat-label">Stock Items</div>
+          <div class="stat-value">{{ stats.totalStock }}</div>
+        </div>
+      </div>
+
+      <!-- Total Dispatches -->
+      <div class="stat-card clickable" (click)="navigateToDispatch()" style="--card-color:#f59e0b">
+        <div class="stat-icon" style="background:#f59e0b">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+               stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13"></rect>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+        </div>
+        <div class="stat-details">
+          <div class="stat-label">Total Dispatches</div>
+          <div class="stat-value">{{ stats.totalDispatches }}</div>
+          <div class="stat-meta">Today: {{ stats.dispatchesToday }}</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===================== CHARTS ===================== -->
+    <div class="charts-grid">
+      <div class="card">
+        <div class="card-header">
+          <h3>Monthly Purchase Orders</h3>
+          <!-- <span class="card-subtitle">Last 8 months</span> -->
+        </div>
+        <div class="card-body">
+          <canvas #procurementChart></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Stock by Category</h3>
+        </div>
+        <div class="card-body">
+          <canvas #stockChart></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Dispatch Status</h3>
+        </div>
+        <div class="card-body">
+          <canvas #dispatchChart></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== TABLES ===================== -->
+    <div class="tables-grid">
+
+      <!-- RECENT PURCHASE ORDERS -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Recent Purchase</h3>
+          <button class="view-all-btn" (click)="navigateToPO()">View All →</button>
+        </div>
+        <div class="card-body">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>PO No</th>
+                <th>Supplier</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let po of recentPOs" class="clickable-row" (click)="navigateToPO()">
+                <td data-label="PO No">{{ po.poNo }}</td>
+                <td data-label="Supplier">{{ po.supplier }}</td>
+                <td data-label="Status">
+                  <span class="status-badge"
+                        [class.status-pending]="po.status === 'Pending' || po.status === 'Open'"
+                        [class.status-completed]="po.status === 'Completed'">
+                    {{ po.status }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="recentPOs.length === 0">
+                <td colspan="3" class="no-data">No purchase orders found</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- LOW STOCK -->
+      <div class="card alert-card">
+        <div class="card-header">
+          <h3>Low Stock Alert</h3>
+          <button class="view-all-btn" (click)="navigateToStock()">View All →</button>
+        </div>
+        <div class="card-body">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Current</th>
+                <th>Min</th>
+                <th>Category</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of lowStockItems" class="clickable-row alert-row">
+                <td data-label="Item">{{ item.item }}</td>
+                <td data-label="Current" class="alert-text">{{ item.stock }}</td>
+                <td data-label="Min">{{ item.minStock }}</td>
+                <td data-label="Category">{{ item.category }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- UPCOMING DISPATCH -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Upcoming Dispatch</h3>
+          <button class="view-all-btn" (click)="navigateToDispatch()">View All →</button>
+        </div>
+        <div class="card-body">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>DC No</th>
+                <th>Customer</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let dispatch of upcomingDispatches" class="clickable-row">
+                <td data-label="DC No">{{ dispatch.dcNo }}</td>
+                <td data-label="Customer">{{ dispatch.customer }}</td>
+                <td data-label="Status">
+                  <span class="status-badge"
+                        [class.status-pending]="dispatch.status === 'Pending'"
+                        [class.status-progress]="dispatch.status === 'In Progress'"
+                        [class.status-completed]="dispatch.status === 'Completed'">
+                    {{ dispatch.status }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>

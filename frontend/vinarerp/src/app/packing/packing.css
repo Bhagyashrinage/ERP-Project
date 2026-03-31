@@ -1,0 +1,33 @@
+.table-sm {
+  font-size: 0.85rem;
+}
+
+.table-sm th,
+.table-sm td {
+  padding: 0.3rem;
+  white-space: nowrap;
+}
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.65em;
+}
+
+.form-label {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.form-control {
+  font-size: 0.9rem;
+}
+
+hr {
+  margin: 0.5rem 0;
+}
+
+/* Note: responsive rules moved to global stylesheet src/styles/responsive.css */

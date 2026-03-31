@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Receiver Name</title>
+</head>
+<body>
+    <h2>Test Job Work Receiver Name</h2>
+    
+    <form id="testForm">
+        <h3>Create Test Receipt</h3>
+        <label>Challan ID: <input type="number" id="challanId" value="1"></label><br><br>
+        <label>Challan No: <input type="text" id="challanNo" value="TEST-001"></label><br><br>
+        <label>Receiver Name: <input type="text" id="receiverName" value="Test Receiver"></label><br><br>
+        <label>Receipt Date: <input type="date" id="receiptDate" value="2026-01-28"></label><br><br>
+        <label>Qty Received: <input type="number" id="qtyReceived" value="100"></label><br><br>
+        <label>Actual Weight: <input type="number" id="actualWeight" value="50"></label><br><br>
+        <label>Kata Weight: <input type="number" id="kataWeight" value="48"></label><br><br>
+        <label>Job Charge: <input type="number" id="jobCharge" value="500"></label><br><br>
+        
+        <button type="button" onclick="testCreateReceipt()">Create Receipt</button>
+    </form>
+    
+    <div id="result" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
+    
+    <script>
+        function testCreateReceipt() {
+            const receiptData = {
+                challanId: parseInt(document.getElementById('challanId').value),
+                challanNo: document.getElementById('challanNo').value,
+                receiverName: document.getElementById('receiverName').value,
+                receiptDate: document.getElementById('receiptDate').value,
+                qtyReceived: parseFloat(document.getElementById('qtyReceived').value),
+                actualWeight: parseFloat(document.getElementById('actualWeight').value),
+                kataWeight: parseFloat(document.getElementById('kataWeight').value),
+                jobCharge: parseFloat(document.getElementById('jobCharge').value),
+                status: 'PENDING'
+            };
+            
+            fetch('http://localhost:8080/api/jobwork/receipts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(receiptData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerHTML = 
+                    '<h3>Success!</h3>' +
+                    '<p>Receipt created with ID: ' + data.id + '</p>' +
+                    '<p>Receiver Name: ' + data.receiverName + '</p>' +
+                    '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            })
+            .catch(error => {
+                document.getElementById('result').innerHTML = 
+                    '<h3>Error!</h3>' +
+                    '<p>' + error.message + '</p>';
+            });
+        }
+        
+        // Test getting all receipts
+        function testGetReceipts() {
+            fetch('http://localhost:8080/api/jobwork/receipts')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('result').innerHTML = 
+                        '<h3>All Receipts:</h3>' +
+                        '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                })
+                .catch(error => {
+                    document.getElementById('result').innerHTML = 
+                        '<h3>Error!</h3>' +
+                        '<p>' + error.message + '</p>';
+                });
+        }
+    </script>
+    
+    <button onclick="testGetReceipts()">Get All Receipts</button>
+</body>
+</html>

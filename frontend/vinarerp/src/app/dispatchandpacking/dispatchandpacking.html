@@ -1,0 +1,250 @@
+<div class="container-fluid">
+  <h2 class="my-4">Dispatch Management</h2>
+
+  <!-- Global message -->
+  <p *ngIf="message" class="alert alert-info">{{ message }}</p>
+
+  <!-- Loading spinner for Packed Items -->
+  <div *ngIf="loadingPackedItems" class="d-flex justify-content-center my-3">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Top bar: Back button + info -->
+  <div class="d-flex justify-content-between mb-3">
+    <button class="btn btn-success" routerLink="/packing">← Go to Packing</button>
+    <div class="alert alert-info mb-0">
+      🚚 Select packed items to create dispatch entries.
+    </div>
+  </div>
+
+  <!-- Packed Items Table -->
+  <!-- Filters for Packed Items -->
+  <!-- <div class="mb-3">
+    <div class="d-flex flex-wrap align-items-center p-3 rounded" style="background:#f6f7f8; gap:0.5rem;">
+      
+    </div>
+  </div> -->
+
+  <div class="card mb-4" *ngIf="packedItems.length > 0">
+    <div class="card-body">
+      <h5 class="card-title">✅ Packed Items (Ready for Dispatch)</h5>
+      <p class="text-muted mb-2">📅 Sorted by newest packing date first</p>
+  <div class="table-responsive no-stack">
+        <table class="table table-striped table-hover table-sm">
+          <thead class="thead-dark">
+            <tr>
+              <th>PO No</th>
+              <th>Customer</th>
+              <th>Grade/Section</th>
+              <th>Length</th>
+              <th>No. Of Pcs</th>
+              <th>Qty (MT)</th>
+              <th>Heat No</th>
+              <th>Packing Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of displayedPackedItems; trackBy: trackByPoHeat">
+              <td>{{ item.poNo }}</td>
+              <td>{{ item.customer }}</td>
+              <td>{{ item.gradeSection }}</td>
+              <td>{{ item.length }}</td>
+              <td>{{ item.noOfPcs }}</td>
+              <td>{{ item.qtyInMt }}</td>
+              <td>{{ item.heatNo }}</td>
+              <td>{{ item.packingDate | date:'dd-MM-yyyy' }}</td>
+              <td>
+                <button class="btn btn-sm btn-success" (click)="openDispatchFormFromPacking(item)">
+                  🚚 Create Dispatch
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination for packed items -->
+      <div class="pagination-container mt-2">
+        <div class="pagination-controls">
+          <button class="pg-btn" (click)="changePagePacked(packedCurrentPage-1)" [disabled]="packedCurrentPage===1">◀ Prev</button>
+          <button *ngFor="let p of [].constructor(packedTotalPages); let i = index" class="pg-btn" [class.active]="packedCurrentPage === (i+1)" (click)="changePagePacked(i+1)">{{ i+1 }}</button>
+          <button class="pg-btn" (click)="changePagePacked(packedCurrentPage+1)" [disabled]="packedCurrentPage===packedTotalPages">Next ▶</button>
+        </div>
+        <div class="pagination-size">
+          <label>Rows:</label>
+          <select (change)="setPackedPageSize(+$any($event.target).value)" [value]="packedPageSize">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loadingPackedItems && packedItems.length === 0" class="alert alert-warning">
+    No packed items available for dispatch.
+  </div>
+
+  <!-- Loading spinner for Dispatch Records -->
+  <div *ngIf="loadingDispatches" class="d-flex justify-content-center my-3">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Dispatch Records Table -->
+  <!-- Filters for Dispatch Records -->
+  <div class="mb-3">
+    <div class="d-flex flex-wrap align-items-center p-3 rounded" style="background:#f6f7f8; gap:0.75rem;">
+      <!-- Search for Dispatch ID or Customer -->
+      <input type="text" class="form-control" placeholder="Search Dispatch ID or Customer" style="width:250px;" [(ngModel)]="dispatchSearch" name="dispatchSearch" (ngModelChange)="applyDispatchFilters()">
+
+      <!-- Status filter -->
+      <select class="form-select" style="width:220px;" [(ngModel)]="dispatchStatus" name="dispatchStatus" (change)="applyDispatchFilters()">
+        <option>All Status</option>
+        <option>Pending</option>
+        <option>In Transit</option>
+        <option>Delivered</option>
+      </select>
+
+      <!-- Sort / action button aligned right -->
+      <button type="button" class="btn ms-auto" style="background:#6f767b;color:#fff;border-radius:8px;padding:0.5rem 1rem;font-weight:600;" (click)="toggleDispatchSort()">{{ dispatchSortOldest ? 'Newest First' : 'Oldest First' }}</button>
+    </div>
+  </div>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Dispatch Records</h5>
+      <p class="text-muted mb-2">📅 Sorted by newest dispatch date first</p>
+  <div class="table-responsive no-stack">
+        <table class="table table-striped table-hover">
+          <thead class="thead-dark">
+            <tr>
+              <th>Dispatch ID</th>
+              <th>PO No</th>
+              <th>Customer</th>
+              <th>Section</th>
+              <th>Qty (MT)</th>
+              <th>Vehicle No</th>
+              <th>From Location</th>
+              <th>To Destination</th>
+              <th>Status</th>
+              <th>Dispatch Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of displayedDispatches; trackBy: trackByDispatchId">
+              <td>{{ d.dispatchId }}</td>
+              <td>{{ d.poNo }}</td>
+              <td>{{ d.customer }}</td>
+              <td>{{ d.section }}</td>
+              <td>{{ d.qtyIssued }}</td>
+              <td>{{ d.vehicleNo || '-' }}</td>
+              <td>{{ d.fromLocation || '-' }}</td>
+              <td>{{ d.destination || '-' }}</td>
+              <td>
+                <span class="badge" [ngClass]="getBadgeClass(d.status)">{{ d.status }}</span>
+              </td>
+              <td>{{ d.disJpatchDate | date:'dd-MM-yyyy' }}</td>
+              <td>
+                <button *ngIf="d.status==='Pending'" class="btn btn-sm btn-warning me-1" 
+                        (click)="updateDispatchStatus(d, 'In Transit')">🚚 In Transit</button>
+                <button *ngIf="d.status==='In Transit'" class="btn btn-sm btn-success" 
+                        (click)="updateDispatchStatus(d, 'Delivered')">✅ Delivered</button>
+                <button *ngIf="d.status==='Pending'" class="btn btn-sm btn-info me-1" (click)="editDispatch(d)">✏️ Edit</button>
+                <span *ngIf="d.status==='Delivered'" class="badge bg-success">✅ Complete</span>
+              </td>
+            </tr>
+            <tr *ngIf="dispatches.length === 0 && !loadingDispatches">
+              <td colspan="11" class="text-center">No dispatch records found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination for dispatches -->
+      <div class="pagination-container mt-2 mb-3">
+        <div class="pagination-controls">
+          <button class="pg-btn" (click)="changePageDispatch(dispatchCurrentPage-1)" [disabled]="dispatchCurrentPage===1">◀ Prev</button>
+          <button *ngFor="let p of [].constructor(dispatchTotalPages); let i = index" class="pg-btn" [class.active]="dispatchCurrentPage === (i+1)" (click)="changePageDispatch(i+1)">{{ i+1 }}</button>
+          <button class="pg-btn" (click)="changePageDispatch(dispatchCurrentPage+1)" [disabled]="dispatchCurrentPage===dispatchTotalPages">Next ▶</button>
+        </div>
+        <div class="pagination-size">
+          <label>Rows:</label>
+          <select (change)="setDispatchPageSize(+$any($event.target).value)" [value]="dispatchPageSize">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------------- Dispatch Modal ---------------- -->
+  <div class="modal fade" [class.show]="showDispatchForm" [style.display]="showDispatchForm ? 'block' : 'none'" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ isEditMode ? 'Edit' : 'Create' }} Dispatch Entry</h5>
+          <button type="button" class="btn-close" (click)="closeDispatchForm()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info" *ngIf="selectedPacking">
+            <strong>Packing:</strong> {{ selectedPacking.poNo }} | <strong>Customer</strong> {{ selectedPacking.customer }}
+          </div>
+
+          <form #dispatchForm="ngForm" (ngSubmit)="saveDispatch(dispatchForm)">
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Dispatch ID</label>
+                <input type="text" class="form-control" [(ngModel)]="dispatch.dispatchId" name="dispatchId" readonly>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">PO No</label>
+                <input type="text" class="form-control" [(ngModel)]="dispatch.poNo" name="poNo" readonly>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Vehicle No <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" [(ngModel)]="dispatch.vehicleNo" name="vehicleNo" required>
+                <div *ngIf="dispatchForm.submitted && !dispatch.vehicleNo" class="text-danger">Vehicle No is required.</div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">From Location <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" [(ngModel)]="dispatch.fromLocation" name="fromLocation" required>
+                <div *ngIf="dispatchForm.submitted && !dispatch.fromLocation" class="text-danger">From Location is required.</div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Destination <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" [(ngModel)]="dispatch.destination" name="destination" required>
+                <div *ngIf="dispatchForm.submitted && !dispatch.destination" class="text-danger">Destination is required.</div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Dispatch Date</label>
+                <input type="date" class="form-control" [(ngModel)]="dispatch.dispatchDate" name="dispatchDate" required>
+              </div>
+            </div>
+
+            <div class="text-end">
+              <button type="button" class="btn btn-secondary me-2" (click)="closeDispatchForm()">Cancel</button>
+              <button type="submit" class="btn btn-primary" [disabled]="savingDispatch">
+                {{ savingDispatch ? 'Saving...' : (isEditMode ? 'Update Dispatch' : 'Create Dispatch') }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

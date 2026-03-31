@@ -1,0 +1,234 @@
+<div class="tabs-container">
+  <button [class.active]="activeTab === 'create'" (click)="switchTab('create')">
+    + Create Rolling Plan
+  </button>
+  <button [class.active]="activeTab === 'list'" (click)="switchTab('list')">
+    📋 All Rolling Plans
+  </button>
+</div>
+
+<!-- ================= CREATE ================= -->
+<div *ngIf="activeTab === 'create'" class="plan-container">
+  <h2>Create Rolling Plan</h2>
+
+  <!-- LOI / Mill / Shift -->
+  <div class="form-grid">
+    <div>
+      <label>LOI</label>
+      <select (change)="onSelectLOI($event)">
+        <option value="">-- Select LOI --</option>
+        <option *ngFor="let l of lois" [value]="l.id">{{ l.loiNumber }} - {{ l.customerName }}</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Mill</label>
+      <input type="text" [(ngModel)]="plan.mill" placeholder="Mill A / Mill B" />
+    </div>
+
+    <div>
+      <label>Shift</label>
+      <select [(ngModel)]="plan.shift">
+        <option value="">Select Shift</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- LOI Items Table -->
+  <div *ngIf="plan.items.length" class="items-section">
+    <h3>LOI Items</h3>
+    <div class="table-responsive no-stack">
+      <table>
+      <thead>
+        <tr>
+          <th>Select</th>
+          <th>Material</th>
+          <th>Grade</th>
+          <th>Section</th>
+          <th>Length</th>
+          <th>Required Qty</th>
+          <th>Unit</th>
+          <th>Selected Stocks</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let it of plan.items">
+          <td><input type="checkbox" [(ngModel)]="it.selected" /></td>
+          <td>{{ it.material }}</td>
+          <td>{{ it.grade }}</td>
+          <td>{{ it.section }}</td>
+          <td>{{ it.length }}</td>
+          <td>{{ it.quantity }}</td>
+          <td>{{ it.unit }}</td>
+          <td>
+            <div *ngIf="it.selectedStock?.length; else noStock" class="selected-list">
+              <div *ngFor="let s of it.selectedStock; let idx = index" class="selected-item">
+                <span class="selected-id">{{ s.stockId }}</span>
+                <small>({{ s.plannedQty }})</small>
+                <button class="btn-outline small" (click)="removeSelectedStock(it.loiItemId, idx)">✖</button>
+              </div>
+            </div>
+            <ng-template #noStock>-</ng-template>
+          </td>
+          <td>
+            <button class="btn-outline" (click)="openStockModal(it)">🔍 Select Stock</button>
+          </td>
+        </tr>
+      </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Create Plan Button -->
+  <div class="actions">
+    <button class="btn-primary" (click)="createPlanFromSelections()" [disabled]="loading">
+      ✅ Create Plan
+    </button>
+  </div>
+
+  <!-- Success/Error Message -->
+  <div *ngIf="message" class="success-msg">{{ message }}</div>
+  <div *ngIf="errorMessage" class="error-msg">{{ errorMessage }}</div>
+</div>
+
+<!-- ================= LIST ================= -->
+<div *ngIf="activeTab === 'list'" class="plan-list">
+  <h2>All Rolling Plans</h2>
+
+  <div *ngIf="loading" class="loading">Loading...</div>
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+  <div class="filter-section" style="margin-bottom:16px;">
+    <input type="text" placeholder="Search by Plan No, LOI, Mill, Shift, Status"
+           [(ngModel)]="planFilter"
+           (input)="applyFilter()"
+           class="filter-input" />
+  </div>
+
+  <div class="table-responsive no-stack">
+    <table *ngIf="!loading && filteredPlans.length">
+    <thead>
+      <tr>
+        <th>Plan No</th>
+        <th>Date</th>
+        <th>Location</th>
+        <th>Mill</th>
+        <th>Shift</th>
+        <th>Status</th>
+        <th>LOI ID</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of displayedPlans">
+        <td>{{ p.planNumber }}</td>
+        <td>{{ p.planDate }}</td>
+        <td>{{ p.location }}</td>
+        <td>{{ p.mill }}</td>
+        <td>{{ p.shift }}</td>
+        <td>
+          <span [ngClass]="badgeClass(p.status)">
+            {{ p.status === 'Completed' ? '✅ Completed' : '⏳ ' + p.status }}
+          </span>
+        </td>
+        <td>{{ p.loiId }}</td>
+        <td>
+          <button *ngIf="p.status !== 'Completed'" class="btn-success" (click)="markAsCompleted(p)">
+            ✅ Mark Completed
+          </button>
+          <span *ngIf="p.status === 'Completed'" class="text-success"><small>Ready for Packing</small></span>
+        </td>
+      </tr>
+    </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!loading && !filteredPlans.length" class="no-data">No plans found.</div>
+
+  <!-- Pagination for Rolling Plans -->
+  <div *ngIf="filteredPlans.length" class="pagination-container">
+    <div class="pagination-info">Showing {{ ((currentPage-1)*pageSize)+1 }} - {{ Math.min(currentPage*pageSize, filteredPlans.length) }} of {{ filteredPlans.length }}</div>
+    <div class="pagination-controls">
+      <button class="pg-btn" (click)="changePage(currentPage-1)" [disabled]="currentPage===1">◀ Prev</button>
+      <button *ngFor="let p of [].constructor(totalPages); let i = index" class="pg-btn" [class.active]="currentPage === (i+1)" (click)="changePage(i+1)">{{ i+1 }}</button>
+      <button class="pg-btn" (click)="changePage(currentPage+1)" [disabled]="currentPage===totalPages">Next ▶</button>
+    </div>
+    <div class="pagination-size">
+      <label>Rows:</label>
+      <select (change)="setPageSize(+$any($event.target).value)" [value]="pageSize">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ================= STOCK MODAL ================= -->
+<div class="modal" *ngIf="showStockModal">
+  <div class="modal-content">
+    <span class="close-btn" (click)="closeStockModal()">&times;</span>
+    <h3>Eligible Stock for {{ selectedItem?.section }}</h3>
+
+    <div *ngIf="eligibleStock.length; else noEligible" class="stock-modal-body">
+      <div class="table-responsive no-stack">
+        <table class="stock-table">
+        <thead>
+          <tr>
+            <th>Select</th>
+            <th>ID</th>
+            <th>Material</th>
+            <th>Grade</th>
+            <th>Section</th>
+            <th>Length</th>
+            <th>Available Qty</th>
+            <th>Location</th>
+            <th>Planned Qty</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of eligibleStock">
+            <td>
+              <input type="checkbox" 
+                     [checked]="isModalSelected(s)" 
+                     (change)="toggleModalSelection(s, $event.target.checked)" />
+            </td>
+            <td>{{ s.id }}</td>
+            <td>{{ s.material }}</td>
+            <td>{{ s.grade }}</td>
+            <td>{{ s.section }}</td>
+            <td>{{ s.length }}</td>
+            <td>{{ s.totalQuantity }}</td>
+            <td>{{ s.location }}</td>
+            <td>
+              <input type="number" 
+                     min="1" 
+                     [max]="s.totalQuantity" 
+                     [(ngModel)]="modalQty[s.id]" 
+                     placeholder="Qty"
+                     [disabled]="!isModalSelected(s)" />
+            </td>
+          </tr>
+        </tbody>
+        </table>
+      </div>
+
+      <div class="modal-actions" style="margin-top:16px; text-align:right;">
+        <button class="btn-outline" (click)="closeStockModal()">Cancel</button>
+        <button class="btn-primary" (click)="confirmStockSelection()">Confirm Selection</button>
+      </div>
+    </div>
+
+    <ng-template #noEligible>
+      <div class="no-data">No eligible stock found.</div>
+      <div style="text-align:right; margin-top:16px;">
+        <button class="btn-outline" (click)="closeStockModal()">Close</button>
+      </div>
+    </ng-template>
+  </div>
+</div>
