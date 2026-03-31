@@ -1,0 +1,88 @@
+<div class="raw-material-container">
+  <h2>All GRNs</h2>
+
+  <!-- Search Box -->
+  <div class="search-container">
+    <input
+      type="text"
+      placeholder="Search by GRN Number, Date, or Vehicle Number"
+      [(ngModel)]="searchTerm"
+      (input)="filterGrns()"
+    />
+  </div>
+
+  <!-- Sorting Buttons -->
+  <div class="sort-container">
+    <button (click)="sortGrns('grnNumber')">Sort by GRN Number</button>
+    <button (click)="sortGrns('grnDate')">Sort by Date</button>
+    <button (click)="sortGrns('vehicleNo')">Sort by Vehicle No</button>
+  </div>
+
+  <!-- Loading & Error Messages -->
+  <div *ngIf="loading" class="loading-msg">Loading GRNs...</div>
+  <div *ngIf="errorMessage" class="error-msg">{{ errorMessage }}</div>
+
+  <!-- GRN List -->
+  <div *ngIf="displayedGrns?.length; else noGrns">
+    <div *ngFor="let grn of displayedGrns" class="grn-card">
+      <div class="grn-header">
+        <h3>{{ grn.grnNumber || 'N/A' }}</h3>
+        <span>Order No: {{ grn.orderNo || 'N/A' }}</span>
+        <span>Location: {{ grn.location || 'N/A' }}</span>
+        <span>Vehicle: {{ grn.vehicleNo || 'N/A' }}</span>
+        <span>Date: {{ grn.grnDate || 'N/A' }}</span>
+      </div>
+
+      <table class="grn-table" *ngIf="grn.items?.length; else noItems">
+        <thead>
+          <tr>
+            <th>Grade</th>
+            <th>Section</th>
+            <th>Material</th>
+            <th>Total Qty</th>
+            <th>Total Received till now</th>
+            <th>Received Qty</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of grn.items">
+            <td data-label="Grade">{{ item.grade || 'N/A' }}</td>
+            <td data-label="Section">{{ item.section || 'N/A' }}</td>
+            <td data-label="Material">{{ item.material || 'N/A' }}</td>
+            <td data-label="Total Qty">{{ item.quantity || 0 }}</td>
+            <td data-label="Already Received">{{ item.alreadyReceived || 0 }}</td>
+            <td data-label="Received Qty">{{ item.receivedQuantity || 0 }}</td>
+            <td data-label="Remarks">{{ item.remarks || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #noItems>
+        <p class="no-items-msg">No items received for this GRN.</p>
+      </ng-template>
+    </div>
+  </div>
+
+  <ng-template #noGrns>
+    <p class="no-grns-msg">No GRNs found.</p>
+  </ng-template>
+
+  <!-- Pagination for GRNs -->
+  <div *ngIf="filteredGrns?.length" class="pagination-container mt-3">
+    <div class="pagination-controls">
+      <button class="pg-btn" (click)="changePageGrns(grnCurrentPage-1)" [disabled]="grnCurrentPage===1">◀ Prev</button>
+      <button *ngFor="let p of [].constructor(grnTotalPages); let i = index" class="pg-btn" [class.active]="grnCurrentPage === (i+1)" (click)="changePageGrns(i+1)">{{ i+1 }}</button>
+      <button class="pg-btn" (click)="changePageGrns(grnCurrentPage+1)" [disabled]="grnCurrentPage===grnTotalPages">Next ▶</button>
+    </div>
+    <div class="pagination-size">
+      <label>Rows:</label>
+      <select (change)="setGrnPageSize(+$any($event.target).value)" [value]="grnPageSize">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+      </select>
+    </div>
+  </div>
+</div>

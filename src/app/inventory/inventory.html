@@ -1,0 +1,259 @@
+<div class="inventory-container">
+  <style>
+    /* Responsive fixes for mobile & tablet: keep table layout (no stacking) and allow horizontal scroll */
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Apply only for small and medium screens (tablet + mobile) so desktop remains unchanged */
+    @media (max-width: 992px) {
+      /* Prevent any 'stack' behavior that converts cells to block with labels */
+      /* Target any table inside the .table-responsive.no-stack container */
+      .table-responsive.no-stack table,
+      .table-responsive.no-stack table thead,
+      .table-responsive.no-stack table tbody,
+      .table-responsive.no-stack table tr,
+      .table-responsive.no-stack table th,
+      .table-responsive.no-stack table td {
+        display: table !important;
+        table-layout: auto !important;
+      }
+
+      /* Ensure pseudo-labels used by some responsive helpers are hidden */
+      .table-responsive.no-stack table td:before,
+      .table-responsive.no-stack table th:before {
+        display: none !important;
+        content: none !important;
+      }
+
+      /* Allow horizontal scrolling while keeping header visible (sticky) */
+      .table-responsive.no-stack {
+        position: relative;
+      }
+
+      .table-responsive.no-stack table {
+        min-width: 720px; /* let table expand horizontally on small screens */
+        border-collapse: collapse;
+        /* Use fixed layout with explicit column widths for predictable alignment */
+        table-layout: fixed !important;
+        width: 100% !important;
+      }
+
+      .table-responsive.no-stack table thead th {
+        position: sticky;
+        top: 0;
+        font-weight: bolder;
+        background: #fff;
+        z-index: 3;
+        text-align: left;
+      }
+
+      .table-responsive.no-stack table td,
+      .table-responsive.no-stack table th {
+        padding: 10px 12px;
+        white-space: nowrap;
+        vertical-align: middle;
+      }
+
+      /* Set approximate column widths so header and body columns align consistently */
+      .table-responsive.no-stack table.no-stack th:nth-child(1),
+      .table-responsive.no-stack table.no-stack td:nth-child(1) { width: 12% !important; }
+      .table-responsive.no-stack table.no-stack th:nth-child(2),
+      .table-responsive.no-stack table.no-stack td:nth-child(2) { width: 12% !important; }
+      .table-responsive.no-stack table.no-stack th:nth-child(3),
+      .table-responsive.no-stack table.no-stack td:nth-child(3) { width: 10% !important; }
+      .table-responsive.no-stack table.no-stack th:nth-child(4),
+      .table-responsive.no-stack table.no-stack td:nth-child(4) { width: 10% !important; }
+      .table-responsive.no-stack table.no-stack th:nth-child(5),
+      .table-responsive.no-stack table.no-stack td:nth-child(5) { width: 10% !important; }
+  /* Make Length and Type columns wider and allow wrapping so values sit below the header */
+  .table-responsive.no-stack table.no-stack th:nth-child(6),
+  .table-responsive.no-stack table.no-stack td:nth-child(6) { width: 12% !important; }
+  .table-responsive.no-stack table.no-stack th:nth-child(7),
+  .table-responsive.no-stack table.no-stack td:nth-child(7) { width: 10% !important; }
+      .table-responsive.no-stack table.no-stack th:nth-child(8),
+      .table-responsive.no-stack table.no-stack td:nth-child(8) { width: 12% !important; text-align: right !important; }
+      .table-responsive.no-stack table.no-stack th:nth-child(9),
+      .table-responsive.no-stack table.no-stack td:nth-child(9) { width: 20% !important; }
+
+      /* Specifically allow Length/Type cell content to wrap and sit below header label on narrow devices */
+      .table-responsive.no-stack table.no-stack th:nth-child(6),
+      .table-responsive.no-stack table.no-stack th:nth-child(7) {
+        text-align: start !important;
+        white-space: normal !important;
+        line-height: 1.1 !important;
+      }
+      .table-responsive.no-stack table.no-stack td:nth-child(5)
+      {
+      text-align: center !important;
+      }
+      .table-responsive.no-stack table.no-stack td:nth-child(6),
+      .table-responsive.no-stack table.no-stack td:nth-child(7) {
+        text-align: end !important;
+        /* margin-left: 20px !important; */
+        white-space: normal !important;
+        padding-top: 6px !important;
+      }
+
+      .table-responsive.no-stack table.no-stack td:nth-child(9){
+        text-align: end !important;
+         margin-left: 20px !important;
+      }
+
+
+      /* Improve touch target for action buttons and rows */
+      .table-responsive.no-stack table tr {
+        cursor: default;
+      }
+    }
+
+    /* Extra-strong override for small phones where global responsive.css forces stacking
+       We target the exact breakpoint used by responsive.css (<= 767.98px) and use
+       very specific selectors with !important to ensure our table stays as a table. */
+    @media (max-width: 767.98px) {
+      .table-responsive.no-stack > table.no-stack,
+      .table-responsive.no-stack > table.no-stack thead,
+      .table-responsive.no-stack > table.no-stack tbody,
+      .table-responsive.no-stack > table.no-stack tr,
+      .table-responsive.no-stack > table.no-stack th,
+      .table-responsive.no-stack > table.no-stack td {
+        display: table !important;
+        table-layout: auto !important;
+      }
+
+      .table-responsive.no-stack > table.no-stack thead {
+        display: table-header-group !important;
+      }
+
+      .table-responsive.no-stack > table.no-stack tbody tr {
+        display: table-row !important;
+      }
+
+      .table-responsive.no-stack > table.no-stack td,
+      .table-responsive.no-stack > table.no-stack th {
+        display: table-cell !important;
+        white-space: nowrap !important;
+        padding: 8px 10px !important;
+      }
+
+      /* Remove stacked pseudo-labels added via data-label ::before rules */
+      .table-responsive.no-stack > table.no-stack td[data-label]::before,
+      .table-responsive.no-stack > table.no-stack td::before,
+      .table-responsive.no-stack > table.no-stack th::before {
+        content: none !important;
+        display: none !important;
+        width: auto !important;
+      }
+
+      /* Keep horizontal scroll available */
+      .table-responsive.no-stack { overflow-x: auto !important; }
+
+      /* Extra specificity: if the table is wrapped inside a .card (common layout),
+         these selectors will override the stacked/card rules coming from global CSS */
+      .card .table-responsive.no-stack > table.no-stack,
+      .card .table-responsive.no-stack > table.no-stack thead,
+      .card .table-responsive.no-stack > table.no-stack tbody,
+      .card .table-responsive.no-stack > table.no-stack tr,
+      .card .table-responsive.no-stack > table.no-stack th,
+      .card .table-responsive.no-stack > table.no-stack td {
+        display: table !important;
+        table-layout: auto !important;
+      }
+
+      .card .table-responsive.no-stack > table.no-stack thead { display: table-header-group !important; }
+      .card .table-responsive.no-stack > table.no-stack tbody tr { display: table-row !important; }
+      .card .table-responsive.no-stack > table.no-stack td,
+      .card .table-responsive.no-stack > table.no-stack th {
+        display: table-cell !important;
+        white-space: nowrap !important;
+        padding: 8px 10px !important;
+        text-align: left !important;
+        vertical-align: middle !important;
+      }
+    }
+  </style>
+  <h2 class="page-title">Raw Material Stock</h2>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="filter-group">
+      <label>Location</label>
+      <select [(ngModel)]="selectedLocation" (change)="applyFilters()">
+        <option value="">All</option>
+        <option *ngFor="let loc of locations" [value]="loc">{{ loc }}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Material</label>
+      <select [(ngModel)]="selectedMaterial" (change)="applyFilters()">
+        <option value="">All</option>
+        <option *ngFor="let mat of materials" [value]="mat">{{ mat }}</option>
+      </select>
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn-refresh" (click)="fetchAllStock()" aria-label="Refresh stock data">🔄 Refresh</button>
+      <button class="btn-reset" (click)="resetFilters()" aria-label="Reset filters">Reset</button>
+    </div>
+  </div>
+
+  <!-- Loading / Error -->
+  <div *ngIf="loading" class="loading">Loading stock data...</div>
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+  <!-- Stock Table -->
+  <div class="table-responsive no-stack">
+  <table *ngIf="!loading && filteredStock.length > 0" class="stock-table table table-sm no-stack">
+    <thead>
+      <tr>
+        <th>Location</th>
+        <th>Material</th>
+        <th>Grade</th>
+        <th>Section</th>
+        <th>Width (mm)</th>
+        <th>Length (mm)</th>
+        <th>Type</th>
+        <th>Total Quantity</th>
+        <th>Last Updated</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let stock of displayedStock; trackBy: trackByStock">
+        <td>{{ stock.location }}</td>
+        <td>{{ stock.material }}</td>
+        <td>{{ stock.grade }}</td>
+        <td>{{ stock.section }}</td>
+        <td>{{ stock.steelWidth || '-' }}</td>
+        <td>{{ stock.length }}</td>
+        <td>{{ stock.type }}</td>
+        <td>{{ stock.totalQuantity }}</td>
+        <td>{{ stock.lastUpdated | date:'dd/MM/yyyy, hh:mm a' }}</td>
+      </tr>
+    </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Controls (match style used across other pages) -->
+  <div *ngIf="!loading && filteredStock?.length" class="pagination-container mt-3">
+    <div class="pagination-controls">
+      <button class="pg-btn" (click)="changePage(currentPage-1)" [disabled]="currentPage===1">◀ Prev</button>
+      <button *ngFor="let p of [].constructor(totalPages); let i = index" class="pg-btn" [class.active]="currentPage === (i+1)" (click)="changePage(i+1)">{{ i+1 }}</button>
+      <button class="pg-btn" (click)="changePage(currentPage+1)" [disabled]="currentPage===totalPages">Next ▶</button>
+    </div>
+    <div class="pagination-size">
+      <label>Rows:</label>
+      <select (change)="setPageSize(+$any($event.target).value)" [value]="pageSize">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && filteredStock.length === 0" class="no-data">
+    No stock records found.
+  </div>
+</div>

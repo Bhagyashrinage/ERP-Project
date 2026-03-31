@@ -1,0 +1,283 @@
+<div class="tabs-container">
+  <button [class.active]="activeTab==='create'" (click)="switchTab('create')">+ Create LOI</button>
+  <button [class.active]="activeTab==='list'" (click)="switchTab('list')">📄 All LOIs</button>
+</div>
+
+<!-- CREATE LOI -->
+<div *ngIf="activeTab==='create'" class="loi-container">
+  <h2 class="title">Create Letter of Intent (LOI)</h2>
+
+  <!-- 🔔 Updated submit handler -->
+  <form (ngSubmit)="onSubmit(loiForm)" #loiForm="ngForm">
+    <div class="form-row">
+      <div class="form-group">
+        <label>LOI No</label>
+        <input type="text" name="loiNumber" [(ngModel)]="loi.loiNumber" placeholder="Auto" required readonly />
+      </div>
+
+      <!-- Customer -->
+<div class="form-group">
+  <label>Customer</label>
+  <input
+    type="text"
+    name="customerName"
+    [(ngModel)]="loi.customerName"
+    required
+    pattern="^[A-Za-z ]+$"
+    #customerName="ngModel"
+    (keypress)="allowOnlyLetters($event)"
+  />
+  <small class="error-msg"
+    *ngIf="customerName.invalid && (customerName.dirty || customerName.touched)">
+    Customer name should contain only letters and spaces.
+  </small>
+</div>
+
+<!-- Location -->
+<div class="form-group">
+  <label>Location</label>
+  <input
+    type="text"
+    name="location"
+    [(ngModel)]="loi.location"
+    required
+    pattern="^[A-Za-z0-9 ]+$"
+    #location="ngModel"
+    (keypress)="allowAlphaNumeric($event)"
+  />
+  <small class="error-msg"
+    *ngIf="location.invalid && (location.dirty || location.touched)">
+    Location should contain only letters and numbers.
+  </small>
+</div>
+
+      <div class="form-group">
+        <label>LOI Date</label>
+        <input type="date" name="loiDate" [(ngModel)]="loi.loiDate" required />
+      </div>
+    </div>
+
+    <h3 class="items-title">Items</h3>
+
+    <div class="items-container">
+      <div class="items-header grid">
+        <div>Material</div>
+        <div>Grade</div>
+        <div>Section</div>
+        <div>Length (mm)</div>
+        <div>Quantity</div>
+        <div>Unit</div>
+        <div>Action</div>
+      </div>
+
+      <div *ngFor="let it of loi.items; let i=index" class="item-row grid">
+
+    <!-- Material (allow letters and numbers) -->
+    <div class="item-field" data-label="Material">
+      <input
+        name="mat{{i}}"
+        [(ngModel)]="it.material"
+        placeholder="Material"
+        required
+        pattern="^[A-Za-z0-9 ]+$"
+        #mat="ngModel"
+        (keypress)="allowAlphaNumeric($event)"
+      />
+      <small class="error-msg" *ngIf="mat.invalid && mat.touched">Only letters and numbers allowed</small>
+    </div>
+
+    <!-- Grade (allow letters and numbers) -->
+    <div class="item-field" data-label="Grade">
+      <input
+        name="gr{{i}}"
+        [(ngModel)]="it.grade"
+        required
+        pattern="^[A-Za-z0-9]+$"
+        #gr="ngModel"
+        (keypress)="allowAlphaNumeric($event)"
+      />
+      <small class="error-msg" *ngIf="gr.invalid && gr.touched">Only letters and numbers allowed</small>
+    </div>
+
+    <!-- Section (allow numbers and symbols: * + - %) -->
+    <div class="item-field" data-label="Section">
+      <input
+        name="sec{{i}}"
+        [(ngModel)]="it.section"
+        required
+        pattern="^[-0-9*+% ]+$"
+        #sec="ngModel"
+        (keypress)="allowNumbersAndSymbols($event)"
+      />
+      <small class="error-msg" *ngIf="sec.invalid && sec.touched">Only numbers and symbols (* + - %) allowed</small>
+    </div>
+
+    <div class="item-field" data-label="Length (mm)">
+      <input ngModel name="len{{i}}" type="number" [(ngModel)]="it.length" required />
+    </div>
+
+    <div class="item-field" data-label="Quantity">
+      <input ngModel name="qty{{i}}" type="number" [(ngModel)]="it.quantity" required />
+    </div>
+
+    <div class="item-field" data-label="Unit">
+      <select [(ngModel)]="it.unit" name="unit{{i}}">
+        <option value="TON">TON</option>
+        <option value="KG">KG</option>
+        <option value="PCS">PCS</option>
+      </select>
+    </div>
+
+    <div class="item-actions" data-label="Action">
+      <button type="button" class="btn-danger" (click)="removeItem(i)">Remove</button>
+    </div>
+  </div>
+  </div>
+
+
+    <div class="actions">
+      <button type="button" class="btn-primary" (click)="addItem()">+ Add Item</button>
+      <button type="submit" class="btn-success" [disabled]="loiForm.invalid">
+        Submit LOI
+      </button>
+    </div>
+
+    <div *ngIf="message" class="success-msg">{{ message }}</div>
+  </form>
+</div>
+
+<hr>
+
+<!-- LIST LOIs -->
+<div *ngIf="activeTab==='list'" class="loi-list-container">
+  <h2>All LOIs</h2>
+
+  <div class="filter-section">
+    <div class="filter-row">
+      <input
+        type="text"
+        placeholder="Search LOI No or Customer"
+        class="filter-input"
+        [(ngModel)]="searchText"
+        (input)="filterLOIs()"
+      />
+
+      <select class="filter-input" [(ngModel)]="statusFilter" (change)="filterLOIs()">
+        <option value="">All Status</option>
+        <option value="Pending">Pending</option>
+        <option value="Planned">Planned</option>
+        <option value="Completed">Completed</option>
+      </select>
+
+      <button class="btn-filter" (click)="sortLatest()">{{ sortDescending ? 'Latest First' : 'Oldest First' }}</button>
+    </div>
+  </div>
+
+  <div class="table-responsive no-stack">
+    <table *ngIf="!loading && lois.length" class="loi-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>LOI No</th>
+        <th>Date</th>
+        <th>Customer</th>
+        <th>Location</th>
+        <th>Status</th>
+        <th style="min-width: 210px;">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let row of displayedLois">
+        <td data-label="ID">{{ formatLoiId(row.id) }}</td>
+        <td data-label="LOI No">{{ row.loiNumber }}</td>
+        <td data-label="Date">{{ row.loiDate }}</td>
+        <td data-label="Customer">{{ row.customerName }}</td>
+        <td data-label="Location">{{ row.location }}</td>
+        <td data-label="Status"><span [ngClass]="badgeClass(row.status)">{{ row.status }}</span></td>
+        <td data-label="Actions">
+          <button class="btn-info" (click)="openLOIModal(row)">View</button>
+
+          <button class="btn-outline"
+                  (click)="updateStatus(row, 'Pending')"
+                  [disabled]="row.status === 'Completed'">
+            Pending
+          </button>
+
+          <button class="btn-outline"
+                  (click)="updateStatus(row, 'Planned')"
+                  [disabled]="row.status === 'Completed'">
+            Planned
+          </button>
+
+          <button class="btn-outline"
+                  (click)="updateStatus(row, 'Completed')"
+                  [disabled]="row.status === 'Completed'">
+            Completed
+          </button>
+        </td>
+      </tr>
+    </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="lois.length" class="pagination-container">
+    <div class="pagination-info">Showing {{ ((currentPage-1)*pageSize)+1 }} - {{ Math.min(currentPage*pageSize, lois.length) }} of {{ lois.length }}</div>
+    <div class="pagination-controls">
+      <button class="pg-btn" (click)="changePage(currentPage-1)" [disabled]="currentPage===1">◀ Prev</button>
+      <button *ngFor="let p of [].constructor(totalPages); let i = index" class="pg-btn" [class.active]="currentPage === (i+1)" (click)="changePage(i+1)">{{ i+1 }}</button>
+      <button class="pg-btn" (click)="changePage(currentPage+1)" [disabled]="currentPage===totalPages">Next ▶</button>
+    </div>
+    <div class="pagination-size">
+      <label>Rows:</label>
+      <select (change)="setPageSize(+$any($event.target).value)" [value]="pageSize">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" *ngIf="showLOIModal">
+  <div class="modal-content">
+    <span class="close-btn" (click)="closeLOIModal()">&times;</span>
+
+  <h3>LOI: {{ formatLoiId(selectedLOI?.id) }} {{ selectedLOI?.loiNumber }}</h3>
+    <div class="meta">
+      <div><strong>Customer:</strong> {{ selectedLOI?.customerName }}</div>
+      <div><strong>Location:</strong> {{ selectedLOI?.location }}</div>
+      <div><strong>Date:</strong> {{ selectedLOI?.loiDate }}</div>
+      <div><strong>Status:</strong> {{ selectedLOI?.status }}</div>
+    </div>
+
+    <h4>Items</h4>
+    <div class="table-responsive no-stack">
+      <table class="items-table">
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Grade</th>
+          <th>Section</th>
+          <th>Length</th>
+          <th>Qty</th>
+          <th>Unit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let it of selectedLOI?.items">
+          <td data-label="Material">{{ it.material }}</td>
+          <td data-label="Grade">{{ it.grade }}</td>
+          <td data-label="Section">{{ it.section }}</td>
+          <td data-label="Length">{{ it.length }}</td>
+          <td data-label="Qty">{{ it.quantity }}</td>
+          <td data-label="Unit">{{ it.unit }}</td>
+        </tr>
+      </tbody>
+      </table>
+    </div>
+  </div>
+</div>

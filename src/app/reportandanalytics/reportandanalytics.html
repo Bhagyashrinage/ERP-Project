@@ -1,0 +1,252 @@
+<div class="reports-container">
+  <h2 class="page-title">
+    📊 Reports & Analytics Dashboard
+    <button class="btn btn-sm btn-primary float-end" (click)="refreshData()">🔄 Refresh</button>
+  </h2>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="error-msg">
+    ⚠️ {{ errorMessage }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-msg">
+    <p>📈 Loading comprehensive analytics data...</p>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- KPI Cards Row 1: Core Metrics -->
+    <div class="kpi-section">
+      <h4 class="section-title">📋 Core Business Metrics</h4>
+      <div class="kpi-grid">
+        <!-- LOI KPI -->
+        <div class="kpi-card">
+          <div class="kpi-icon">📦</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Total LOIs</div>
+            <div class="kpi-value">{{ kpis.totalLOIs }}</div>
+            <div class="kpi-subtext">
+              <span class="badge badge-success">✓ {{ kpis.completedLOIs }} Completed</span>
+              <span class="badge badge-warning">⏳ {{ kpis.pendingLOIs }} Pending</span>
+            </div>
+            <div class="kpi-progress">Completion: {{ getLOICompletion() }}</div>
+          </div>
+        </div>
+
+        <!-- PO KPI -->
+        <div class="kpi-card">
+          <div class="kpi-icon">📄</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Purchase Orders</div>
+            <div class="kpi-value">{{ kpis.totalPOs }}</div>
+            <div class="kpi-subtext">GRNs Received: {{ kpis.totalGRNs }}</div>
+          </div>
+        </div>
+
+        <!-- Production KPI -->
+        <div class="kpi-card">
+          <div class="kpi-icon">🏭</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Production Plans</div>
+            <div class="kpi-value">{{ kpis.totalProductions }}</div>
+            <div class="kpi-subtext">
+              <span class="badge badge-success">✓ {{ kpis.completedProductions }}</span>
+            </div>
+            <div class="kpi-progress">Efficiency: {{ getProductionEfficiency() }}</div>
+          </div>
+        </div>
+
+        <!-- Packing KPI -->
+        <div class="kpi-card">
+          <div class="kpi-icon">📦</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Packing Records</div>
+            <div class="kpi-value">{{ kpis.totalPacking }}</div>
+            <div class="kpi-subtext">Ready to dispatch</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Cards Row 2: Supply Chain -->
+    <div class="kpi-section">
+      <h4 class="section-title">🚚 Supply Chain & Dispatch</h4>
+      <div class="kpi-grid">
+        <!-- Dispatch KPI -->
+        <div class="kpi-card">
+          <div class="kpi-icon">🚛</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Total Dispatches</div>
+            <div class="kpi-value">{{ kpis.totalDispatches }}</div>
+            <div class="kpi-subtext">
+              <span class="badge badge-info">✓ {{ kpis.dispatchedItems }} Delivered</span>
+            </div>
+            <div class="kpi-progress">Delivery Rate: {{ getDispatchCompletion() }}</div>
+          </div>
+        </div>
+
+        <!-- Stock Inventory KPI -->
+        <div class="kpi-card">
+          <div class="kpi-icon">📚</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Total Stock Items</div>
+            <div class="kpi-value">{{ filteredStock.length }}</div>
+            <div class="kpi-subtext">Total Qty: {{ convertToKg(kpis.totalStock) }} KG</div>
+            <div class="kpi-locations">Locations: {{ locations.length }}</div>
+          </div>
+        </div>
+
+        <!-- Jobwork KPI -->
+        <div class="kpi-card">
+          <div class="kpi-icon">🔧</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Jobwork Challans</div>
+            <div class="kpi-value">{{ kpis.totalJobworkChallans }}</div>
+            <div class="kpi-subtext">
+              <span class="badge badge-warning">⏳ {{ kpis.jobworkPending }} Pending</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Materials Tracked -->
+        <div class="kpi-card">
+          <div class="kpi-icon">🔍</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Unique Materials</div>
+            <div class="kpi-value">{{ materials.length }}</div>
+            <div class="kpi-subtext">Material types tracked</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Location-wise Breakdown -->
+    <div class="kpi-section">
+      <h4 class="section-title">📍 Location-wise Inventory</h4>
+      <div class="location-cards">
+        <div *ngFor="let locKPI of locationKPIs" class="location-card">
+          <div class="location-name">📍 {{ locKPI.location }}</div>
+          <div class="location-stats">
+            <div class="stat">
+              <span class="stat-label">Items:</span>
+              <span class="stat-value">{{ locKPI.totalItems }}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Total Qty (KG):</span>
+              <span class="stat-value">{{ getLocationQuantityInKg(locKPI.totalQuantity) }}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Materials:</span>
+              <span class="stat-value">{{ locKPI.uniqueMaterials }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock Inventory Filters & Details -->
+    <div class="card">
+      <div class="card-header">
+        <h5>📊 Stock Inventory Details</h5>
+      </div>
+      <div class="card-body">
+        <div class="filter-row">
+          <div class="filter-col">
+            <label>Filter by Location</label>
+            <select class="form-control" [(ngModel)]="filters.location" (change)="applyFilters()">
+              <option value="">All Locations</option>
+              <option *ngFor="let loc of locations" [value]="loc">{{ loc }}</option>
+            </select>
+          </div>
+          <div class="filter-col">
+            <label>Filter by Material</label>
+            <select class="form-control" [(ngModel)]="filters.material" (change)="applyFilters()">
+              <option value="">All Materials</option>
+              <option *ngFor="let mat of materials" [value]="mat">{{ mat }}</option>
+            </select>
+          </div>
+          <div class="filter-col filter-btn-col">
+            <button class="btn btn-secondary" (click)="resetFilters()">🔄 Reset Filters</button>
+          </div>
+        </div>
+
+        <div class="table-responsive no-stack mt-3">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>Grade</th>
+                <th>Section</th>
+                <th>Length</th>
+                <th>Steel Width</th>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Quantity (KG)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let stock of displayedStock">
+                <td data-label="Material"><strong>{{ stock.material || 'N/A' }}</strong></td>
+                <td data-label="Grade">{{ stock.grade || 'N/A' }}</td>
+                <td data-label="Section">{{ stock.section || 'N/A' }}</td>
+                <td data-label="Length">{{ stock.length || 'N/A' }}</td>
+                <td data-label="Steel Width">{{ stock.steelWidth || 'N/A' }}</td>
+                <td data-label="Type">{{ stock.type || 'N/A' }}</td>
+                <td data-label="Location">
+                  <span class="badge" [ngClass]="{'badge-info': stock.location === 'Butibori', 'badge-secondary': stock.location !== 'Butibori'}">
+                    {{ stock.location || 'N/A' }}
+                  </span>
+                </td>
+                <td data-label="Quantity (KG)"><strong>{{ getStockQuantityInKg(stock) }}</strong></td>
+              </tr>
+              <tr *ngIf="filteredStock.length === 0">
+                <td colspan="8" class="text-center no-data">No stock data available</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination for Stock Inventory Details -->
+        <div *ngIf="filteredStock?.length" class="pagination-container mt-3">
+          <div class="pagination-controls">
+            <button class="pg-btn" (click)="changePage(currentPage-1)" [disabled]="currentPage===1">◀ Prev</button>
+            <button *ngFor="let p of [].constructor(totalPages); let i = index" class="pg-btn" [class.active]="currentPage === (i+1)" (click)="changePage(i+1)">{{ i+1 }}</button>
+            <button class="pg-btn" (click)="changePage(currentPage+1)" [disabled]="currentPage===totalPages">Next ▶</button>
+          </div>
+          <div class="pagination-size">
+            <label>Rows:</label>
+            <select (change)="setPageSize(+$any($event.target).value)" [value]="pageSize">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="summary-stats">
+          <div class="summary-item">
+            <span class="summary-label">Total Items:</span>
+            <span class="summary-value">{{ filteredStock.length }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Total Quantity:</span>
+            <span class="summary-value">{{ getTotalFilteredQuantity() }} KG</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary-section">
+      <h4 class="section-title">📈 Executive Summary</h4>
+      <div class="summary-box">
+        <p>✅ <strong>{{ kpis.completedLOIs }}</strong> LOIs completed out of <strong>{{ kpis.totalLOIs }}</strong> total</p>
+        <p>✅ <strong>{{ kpis.completedProductions }}</strong> production plans completed out of <strong>{{ kpis.totalProductions }}</strong></p>
+        <p>✅ <strong>{{ kpis.dispatchedItems }}</strong> items successfully dispatched</p>
+        <p>📚 <strong>{{ convertToKg(kpis.totalStock) }}</strong> KG of stock available across <strong>{{ locations.length }}</strong> locations</p>
+        <p>🔧 <strong>{{ kpis.totalJobworkChallans }}</strong> jobwork challans issued</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+<div class="container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <!-- Sidebar Header with Emoji Logo -->
+    <div class="sidebar-header">
+      <h1 class="logo">
+        <span class="logo-icon">🏭</span>
+        Vinar <span class="logo-sub">ERP</span>
+      </h1>
+    </div>
+
+    <!-- Sidebar Navigation with Emojis -->
+    <nav class="sidebar-nav">
+      <button routerLink="/dash" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">🏠</span> Dashboard
+      </button>
+      <button routerLink="/loi" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">🧭</span> LOI
+      </button>
+      <button routerLink="/addpo" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">📝</span> Purchase Order
+      </button>
+      <button routerLink="/rawmaterial" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">📦</span> Raw Materials 
+      </button>
+      <button routerLink="/inventory" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">📊</span> Inventory & Stock
+      </button>
+
+      <button routerLink="/production" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">⚙️</span> Production 
+      </button>
+      <button routerLink="/dispatch" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">🚚</span> Dispatch & Packing
+      </button>
+      <button routerLink="/jobwork" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">🔧</span> Job Work
+      </button>
+     
+      <button routerLink="/reports" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">📈</span> Reports & Analytics
+      </button>
+    </nav>
+
+  </aside>
+
+  <!-- Right Content Area -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>
