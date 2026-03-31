@@ -1,0 +1,258 @@
+<div class="container-fluid">
+  <h2 class="my-4">Packing Management</h2>
+
+  <p *ngIf="message" class="alert alert-info">{{ message }}</p>
+
+  <!-- Action Buttons -->
+  <div class="d-flex justify-content-between mb-3">
+    <button class="btn btn-secondary" routerLink="/dispatch">← Back to Dispatch</button>
+    <div class="alert alert-info mb-0">
+      📦 Select completed production items to create packing entries.
+    </div>
+  </div>
+
+  <!-- Completed Production Items -->
+  <div class="card mb-4" *ngIf="completedProductions.length > 0">
+    <div class="card-body">
+      <h5 class="card-title">✅ Completed Production Items (Ready for Packing)</h5>
+  <div class="table-responsive no-stack">
+        <table class="table table-striped table-hover table-sm">
+          <thead class="thead-dark">
+            <tr>
+              <th>Plan No</th>
+              <th>Date</th>
+              <th>Location</th>
+              <th>Mill</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let prod of displayedCompletedProductions">
+              <td data-label="Plan No">{{ prod.planNumber }}</td>
+              <td data-label="Date">{{ prod.planDate | date:'dd-MM-yyyy' }}</td>
+              <td data-label="Location">{{ prod.location }}</td>
+              <td data-label="Mill">{{ prod.mill }}</td>
+              <td data-label="Customer">{{ getCustomerName(prod) }}</td>
+              <td data-label="Items">{{ prod.items?.length || 0 }} items</td>
+              <td data-label="Action">
+                <button class="btn btn-sm btn-success" (click)="openPackingFormFromProduction(prod)">
+                  📦 Create Packing
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination for completed productions -->
+      <div class="pagination-container mt-2">
+        <div class="pagination-controls">
+          <button class="pg-btn" (click)="changePageCompleted(compCurrentPage-1)" [disabled]="compCurrentPage===1">◀ Prev</button>
+          <button *ngFor="let p of [].constructor(compTotalPages); let i = index" class="pg-btn" [class.active]="compCurrentPage === (i+1)" (click)="changePageCompleted(i+1)">{{ i+1 }}</button>
+          <button class="pg-btn" (click)="changePageCompleted(compCurrentPage+1)" [disabled]="compCurrentPage===compTotalPages">Next ▶</button>
+        </div>
+        <div class="pagination-size">
+          <label>Rows:</label>
+          <select (change)="setCompletedPageSize(+$any($event.target).value)" [value]="compPageSize">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Packing Table -->
+  <!-- Filters for Packing Records -->
+  <div class="mb-3">
+    <div class="d-flex flex-wrap align-items-center p-3 rounded" style="background:#f6f7f8; gap:0.75rem;">
+      <input type="text" class="form-control" placeholder="Search PO No " style="width:250px;" [(ngModel)]="packingSearch" name="packingSearch" (ngModelChange)="applyPackingFilters()">
+    
+      <button type="button" class="btn ms-auto" style="background:#6f767b;color:#fff;border-radius:8px;padding:0.5rem 1rem;font-weight:600;" (click)="togglePackingSort()">{{ packingSortOldest ? 'Newest First' : 'Oldest First' }}</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Packing Records</h5>
+      <div *ngIf="loading" class="text-center">Loading...</div>
+  <div class="table-responsive no-stack" *ngIf="!loading">
+        <table class="table table-striped table-hover table-sm">
+          <thead class="thead-dark">
+            <tr>
+              <th>Sr. No.</th>
+              <th>P.O.No.</th>
+              <th>Grade</th>
+              <th>Colour Code</th>
+              <th>Grade/Section</th>
+              <th>Section WT</th>
+              <th>Length</th>
+              <th>No. Of Pcs</th>
+              <th>Qty. in MT.</th>
+              <th>HEAT NO</th>
+              <th>Challan Qty.</th>
+              <th>Challan No.</th>
+              <th>Customer</th>
+              <th>Doc No</th>
+              <th>Date</th>
+              <th>Lorry No</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of displayedPackingItems">
+              <td data-label="Sr. No.">{{ p.srNo }}</td>
+              <td data-label="P.O.No.">{{ p.poNo }}</td>
+              <td data-label="Grade">{{ p.grade }}</td>
+              <td data-label="Colour Code">{{ p.colourCode }}</td>
+              <td data-label="Grade/Section">{{ p.gradeSection }}</td>
+              <td data-label="Section WT">{{ p.sectionWt }}</td>
+              <td data-label="Length">{{ p.length }}</td>
+              <td data-label="No. Of Pcs">{{ p.noOfPcs }}</td>
+              <td data-label="Qty. in MT.">{{ p.qtyInMt }}</td>
+              <td data-label="HEAT NO">{{ p.heatNo }}</td>
+              <td data-label="Challan Qty.">{{ p.challanQty }}</td>
+              <td data-label="Challan No.">{{ p.challanNo }}</td>
+              <td data-label="Customer">{{ p.customer }}</td>
+              <td data-label="Doc No">{{ p.docNo }}</td>
+              <td data-label="Date">{{ p.packingDate | date:'dd-MM-yyyy' }}</td>
+              <td data-label="Lorry No">{{ p.lorryNo }}</td>
+              <td data-label="Status"><span class="badge" [ngClass]="getBadgeClass(p.status)">{{ p.status }}</span></td>
+              <td data-label="Actions">
+                <button class="btn btn-sm btn-success" 
+                        (click)="goToDispatch(p)" 
+                        *ngIf="p.status === 'PACKED'">
+                  🚚 Go to Dispatch
+                </button>
+                <span *ngIf="p.status === 'DISPATCHED'" class="badge bg-info">✅ Dispatched</span>
+              </td>
+            </tr>
+            <tr *ngIf="packingItems.length === 0">
+              <td colspan="18" class="text-center">No packing records found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination for packing records -->
+      <div class="pagination-container mt-2 mb-3">
+        <div class="pagination-controls">
+          <button class="pg-btn" (click)="changePagePacking(packingCurrentPage-1)" [disabled]="packingCurrentPage===1">◀ Prev</button>
+          <button *ngFor="let p of [].constructor(packingTotalPages); let i = index" class="pg-btn" [class.active]="packingCurrentPage === (i+1)" (click)="changePagePacking(i+1)">{{ i+1 }}</button>
+          <button class="pg-btn" (click)="changePagePacking(packingCurrentPage+1)" [disabled]="packingCurrentPage===packingTotalPages">Next ▶</button>
+        </div>
+        <div class="pagination-size">
+          <label>Rows:</label>
+          <select (change)="setPackingPageSize(+$any($event.target).value)" [value]="packingPageSize">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Packing Form Modal -->
+  <div *ngIf="showPackingForm" class="modal" style="display: block; background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">📦 Create Packing Entry</h5>
+          <button type="button" class="btn-close" (click)="closePackingForm()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info" *ngIf="selectedProduction">
+            <strong>Production:</strong> {{ selectedProduction.planNumber }} | 
+            <strong>Location:</strong> {{ selectedProduction.location }}
+          </div>
+          
+          <form (ngSubmit)="savePacking()">
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Customer *</label>
+                <input type="text" class="form-control" [(ngModel)]="packing.customer" name="customer" required>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">PO No *</label>
+                <input type="text" class="form-control" [(ngModel)]="packing.poNo" name="poNo" required readonly>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Grade *</label>
+                <input type="text" class="form-control" [(ngModel)]="packing.grade" name="grade" required>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Grade/Section *</label>
+                <input type="text" class="form-control" [(ngModel)]="packing.gradeSection" name="gradeSection" required>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Length *</label>
+                <input type="number" class="form-control" [(ngModel)]="packing.length" name="length" required>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">No. Of Pcs *</label>
+                <input type="number" class="form-control" [(ngModel)]="packing.noOfPcs" name="noOfPcs" required>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Qty in MT *</label>
+                <input type="number" step="0.001" class="form-control" [(ngModel)]="packing.qtyInMt" name="qtyInMt" required>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Heat No *</label>
+                <input type="text" class="form-control" [(ngModel)]="packing.heatNo" name="heatNo" required>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Doc No *</label>
+                <input type="text" class="form-control" [(ngModel)]="packing.docNo" name="docNo" required>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Packing Date *</label>
+                <input type="date" class="form-control" [(ngModel)]="packing.packingDate" name="packingDate" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Colour Code</label>
+                <input type="text" class="form-control" [(ngModel)]="packing.colourCode" name="colourCode">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Section WT</label>
+                <input type="text" class="form-control" [(ngModel)]="packing.sectionWt" name="sectionWt">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Challan No</label>
+                <input type="text" class="form-control" [(ngModel)]="packing.challanNo" name="challanNo">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Challan Qty</label>
+                <input type="number" step="0.001" class="form-control" [(ngModel)]="packing.challanQty" name="challanQty">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Lorry No</label>
+                <input type="text" class="form-control" [(ngModel)]="packing.lorryNo" name="lorryNo">
+              </div>
+            </div>
+            
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="closePackingForm()">Cancel</button>
+              <button type="submit" class="btn btn-success">✅ Create Packing</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

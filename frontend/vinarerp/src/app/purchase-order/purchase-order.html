@@ -1,0 +1,388 @@
+<div class="tabs-container">
+  <button [class.active]="activeTab==='create'" (click)="switchTab('create')">
+    + Create PO
+  </button>
+  <button [class.active]="activeTab==='list'" (click)="switchTab('list')">
+    📄 All POs
+  </button>
+</div>
+
+<!-- ================= CREATE PO ================= -->
+<div *ngIf="activeTab==='create'" class="po-container">
+  <h2 class="po-title">Create Purchase Order</h2>
+
+<form (ngSubmit)="onSubmitPO(poForm)" #poForm="ngForm">
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Order No</label>
+      <input type="text" [(ngModel)]="po.orderNo" name="orderNo" readonly />
+    </div>
+
+    <!-- Party: alphabets + numbers -->
+    <div class="form-group">
+  <label>Party</label>
+  <input
+    type="text"
+    [(ngModel)]="po.party"
+    name="party"
+    required
+    pattern="^[A-Za-z ]+$"
+    #party="ngModel"
+    (keypress)="allowOnlyLetters($event)"
+  />
+  <small class="error-msg" *ngIf="party.invalid && (party.touched || party.dirty)">
+    Party should contain only alphabets (no numbers or symbols).
+  </small>
+</div>
+
+   <div class="form-group">
+  <label>Date</label>
+  <input
+    type="date"
+    [(ngModel)]="po.date"
+    name="date"
+    required
+    #date="ngModel"
+  />
+  <small class="error-msg" *ngIf="date.invalid && (date.touched || date.dirty)">
+    Date is required.
+  </small>
+</div>
+
+
+    <!-- Location: alphabets + numbers -->
+    <div class="form-group">
+      <label>Location</label>
+      <input
+        type="text"
+        [(ngModel)]="po.location"
+        name="location"
+        required
+        pattern="^[A-Za-z0-9 ]+$"
+        #location="ngModel"
+        (keypress)="allowAlphaNumeric($event)"
+        style="width: 260px;"
+      />
+      <small class="error-msg" *ngIf="location.invalid && (location.touched || location.dirty)">
+        Only letters and numbers allowed.
+      </small>
+    </div>
+
+<!--<div class="form-group">
+      <label>Supplier Name</label>
+      <input type="text" [(ngModel)]="po.supplier" name="supplier" required />
+    </div> -->
+  </div>
+
+  <h3 class="elements-title">Elements</h3>
+
+  <div class="items-container">
+    <div class="items-header grid">
+      <div>Material</div>
+      <div>Grade</div>
+      <div>Section</div>
+      <div>Width (mm)</div>
+      <div>Length (mm)</div>
+      <div>Quantity</div>
+      <div>Type</div>
+      <div>Action</div>
+    </div>
+
+    <div>
+      <div *ngFor="let elem of po.elements; let i = index" class="item-row grid">
+
+        <div class="element-field" data-label="Material">
+          <input
+            type="text"
+            [(ngModel)]="elem.material"
+            name="material{{i}}"
+            required
+            pattern="^[A-Za-z0-9 ]+$"
+            (keypress)="allowAlphaNumeric($event)"
+            placeholder="Material"
+          />
+          <small class="error-msg" *ngIf="poForm.submitted && !elem.material">Material required</small>
+        </div>
+
+        <div class="element-field" data-label="Grade">
+          <input
+            type="text"
+            [(ngModel)]="elem.grade"
+            name="grade{{i}}"
+            required
+            pattern="^[A-Za-z0-9]+$"
+            (keypress)="allowAlphaNumeric($event)"
+            placeholder="Grade"
+          />
+        </div>
+
+        <div class="element-field" data-label="Section">
+          <input
+            type="text"
+            [(ngModel)]="elem.section"
+            name="section{{i}}"
+            required
+            pattern="^[-0-9*+% ]+$"
+            (keypress)="allowNumbersAndSymbols($event)"
+            placeholder="Section"
+          />
+        </div>
+
+        <div class="item-field" data-label="Width (mm)">
+          <input ngModel name="steelWidth{{i}}" type="number" [(ngModel)]="elem.steelWidth" min="0" step="1" placeholder="Width" />
+        </div>
+
+        <div class="item-field" data-label="Length (mm)">
+          <input ngModel name="length{{i}}" type="number" [(ngModel)]="elem.length" required min="0" step="1" />
+        </div>
+
+        <div class="element-field" data-label="Quantity">
+          <input
+            type="number"
+            [(ngModel)]="elem.quantity"
+            name="quantity{{i}}"
+            min="1"
+            required
+            placeholder="Qty"
+          />
+        </div>
+
+        <div class="item-field" data-label="Type">
+          <select [(ngModel)]="elem.type" name="type{{i}}">
+            <option value="TON">TON</option>
+            <option value="KG">KG</option>
+            <option value="PCS">PCS</option>
+          </select>
+        </div>
+
+        <div class="item-actions" data-label="Action">
+          <button type="button" class="btn-danger" (click)="removeElement(i)">Remove</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="button" class="btn-primary" (click)="addElement()">+ Add Element </button>
+    <button type="submit" class="btn-success" [disabled]="poForm.invalid">Submit PO</button>
+  </div>
+
+  <div *ngIf="message" class="success-msg">{{ message }}</div>
+</form>
+
+</div>
+
+<hr />
+
+<!-- ================= LIST PO ================= -->
+<div *ngIf="activeTab==='list'" class="po-list-container">
+  <h2>All POs</h2>
+
+  <div *ngIf="loading">Loading...</div>
+  <div *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <div class="filter-section">
+    <div class="filter-row">
+      <input
+        type="text"
+        placeholder="Search Order No"
+        class="filter-input"
+        [(ngModel)]="searchText"
+        (input)="filterPOs()"
+      />
+
+      <select class="filter-input" [(ngModel)]="statusFilter" (change)="filterPOs()">
+        <option value="">All Status</option>
+        <option value="Pending">Pending</option>
+        <option value="Received">Received</option>
+      </select>
+
+      <button class="btn-filter" (click)="sortLatest()">{{ sortDescending ? 'Latest First' : 'Oldest First' }}</button>
+    </div>
+  </div>
+
+
+  <div class="table-responsive no-stack">
+    <table *ngIf="!loading && purchaseOrders.length" class="po-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Order No</th>
+        <th>Date</th>
+        <th>Party</th>
+        <th>Location</th>
+        <th>Supplier</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+      <tbody>
+      <tr *ngFor="let po of displayedPurchaseOrders">
+        <td data-label="ID">{{ formatPOId(po.id) }}</td>
+        <td data-label="Order No">{{ po.orderNo }}</td>
+        <td data-label="Date">{{ po.date }}</td>
+        <td data-label="Party">{{ po.party }}</td>
+        <td data-label="Location">{{ po.location }}</td>
+        <td data-label="Supplier">{{ po.lastReceiverName }}</td>
+        <td>
+          <span
+            [ngClass]="{
+              'status-received': po.status === 'Received',
+              'status-pending': po.status !== 'Received'
+            }"
+          >
+            {{ po.status }}
+          </span>
+        </td>
+        <td>
+          <button class="view-btn" (click)="openPOModal(po)">View</button>
+          <button
+            class="grn-btn"
+            [disabled]="po.status === 'Received'"
+            (click)="openGRNModal(po)"
+          >
+            + GRN
+          </button>
+        </td>
+      </tr>
+    </tbody>
+    </table>
+  </div>
+      <!-- Pagination -->
+      <div *ngIf="purchaseOrders.length" class="pagination-container">
+        <div class="pagination-info">Showing {{ ((currentPage-1)*pageSize)+1 }} - {{ Math.min(currentPage*pageSize, purchaseOrders.length) }} of {{ purchaseOrders.length }}</div>
+        <div class="pagination-controls">
+          <button class="pg-btn" (click)="changePage(currentPage-1)" [disabled]="currentPage===1">◀ Prev</button>
+          <button *ngFor="let p of [].constructor(totalPages); let i = index" class="pg-btn" [class.active]="currentPage === (i+1)" (click)="changePage(i+1)">{{ i+1 }}</button>
+          <button class="pg-btn" (click)="changePage(currentPage+1)" [disabled]="currentPage===totalPages">Next ▶</button>
+        </div>
+        <div class="pagination-size">
+          <label>Rows:</label>
+          <select (change)="setPageSize(+$any($event.target).value)" [value]="pageSize">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+      </div>
+</div>
+
+<!-- ================= PO MODAL ================= -->
+<div class="modal" *ngIf="showPOModal">
+  <div class="modal-content">
+    <span class="close-btn" (click)="closePOModal()">&times;</span>
+
+  <h3>PO: {{ selectedPO?.orderNo }} <small>({{ formatPOId(selectedPO?.id) }})</small></h3>
+    <p><strong>Party:</strong> {{ selectedPO?.party }}</p>
+    <p><strong>Date:</strong> {{ selectedPO?.date }}</p>
+    <p><strong>Location:</strong> {{ selectedPO?.location }}</p>
+    <p><strong>Status:</strong> {{ selectedPO?.status }}</p>
+
+    <h4>Elements</h4>
+    <div class="table-responsive no-stack">
+      <table class="po-elements-table">
+      <thead>
+        <tr>
+              <th>Material</th>
+              <th>Grade</th>
+              <th>Section</th>
+              <th>Length</th>
+              <th>Qty</th>
+              <th>Received</th>
+              <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of selectedPO?.elements">
+          <td data-label="Material">{{ e.material }}</td>
+          <td data-label="Grade">{{ e.grade }}</td>
+          <td data-label="Section">{{ e.section }}</td>
+          <td data-label="Length">{{ e.length }}</td>
+          <td data-label="Qty">{{ e.quantity }}</td>
+          <td data-label="Received">{{ e.receivedQuantity || 0 }}</td>
+          <td data-label="Type">{{ e.type }}</td>
+        </tr>
+      </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ================= GRN MODAL ================= -->
+<div class="modal" *ngIf="showGRNModal">
+  <div class="modal-content">
+    <span class="close-btn" (click)="closeGRNModal()">&times;</span>
+
+  <h3>GRN for PO: {{ selectedPOForGRN?.orderNo }} <small>({{ formatPOId(selectedPOForGRN?.id) }})</small></h3>
+
+    <div class="grn-meta">
+      <label>GRN No</label>
+      <input [(ngModel)]="grnNumber" name="grnNumberGrn" />
+
+      <label>Vehicle</label>
+      <input [(ngModel)]="vehicleNo" name="vehicleNoGrn" />
+
+      <label>Supplier</label>
+      <input [(ngModel)]="receiverName" name="receiverNameGrn" required />
+
+      <label>Date</label>
+      <input type="date" [(ngModel)]="grnDate" name="grnDateGrn" />
+    </div>
+
+   <h4>Update Received Quantities</h4>
+
+    <div class="table-responsive no-stack">
+      <table class="po-elements-table">
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Grade</th>
+          <th>Section</th>
+          <th>Width</th>
+          <th>Length</th>
+          <th>Qty Left</th>
+          <th>Received</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr
+          *ngFor="let e of selectedPOForGRN?.elements"
+          [ngClass]="{ 'row-complete': qtyLeftFor(e) === 0 }"
+        >
+          <td data-label="Material">{{ e.material }}</td>
+          <td data-label="Grade">{{ e.grade }}</td>
+          <td data-label="Section">{{ e.section }}</td>
+          <td data-label="Width">{{ e.steelWidth }}</td>
+          <td data-label="Length">{{ e.length }}</td>
+          <td data-label="Qty Left">{{ qtyLeftFor(e) }}</td>
+          <td data-label="Received">
+            <input
+              type="number"
+              [(ngModel)]="e.receivedQuantity"
+              name="rec{{e.id}}"
+              min="0"
+              [max]="qtyLeftFor(e)"
+              [disabled]="qtyLeftFor(e) === 0"
+            />
+          </td>
+          <td data-label="Remarks">
+            <input
+              type="text"
+              [(ngModel)]="e.remarks"
+              name="rem{{e.id}}"
+            />
+          </td>
+        </tr>
+      </tbody>
+      </table>
+    </div>
+
+    <button class="submit-btn" (click)="submitGRN()">Create GRN</button>
+  </div>
+</div>

@@ -1,0 +1,590 @@
+/* Tabs */
+.tabs-container { 
+  display:flex; 
+  justify-content:center; 
+  margin:30px 0; 
+}
+.tabs-container button { 
+  background:#f1f1f1; 
+  border:none; 
+  padding:12px 25px; 
+  margin:0 10px; 
+  border-radius:25px; 
+  cursor:pointer; 
+  font-weight:600; 
+  transition:0.3s; 
+}
+.tabs-container button:hover { background:#e0e0e0; }
+.tabs-container button.active { 
+  background:#007bff; 
+  color:white; 
+  box-shadow:0 4px 12px rgba(0,0,0,0.15); 
+}
+
+/* PO Container */
+.po-container, .po-list-container { 
+  width:100%;
+  max-width:100%; 
+  margin:0 0 40px 0; 
+  background:#fff; 
+  border-radius:15px; 
+  padding:30px; 
+  box-shadow:0 4px 20px rgba(0,0,0,0.1); 
+  transition:0.3s; 
+}
+.po-container:hover { box-shadow:0 6px 25px rgba(0,0,0,0.15); }
+.po-title { 
+  text-align:center; 
+  color:#007bff; 
+  margin-bottom:25px; 
+  font-size:28px; 
+}
+
+/* Form Rows */
+.form-row { 
+  display:flex; 
+  flex-wrap:wrap; 
+  gap:20px; 
+  margin-bottom:20px; 
+}
+.form-group { 
+  flex:1; 
+  min-width:220px; 
+  display:flex; 
+  flex-direction:column; 
+}
+.form-group label { 
+  font-weight:600; 
+  margin-bottom:5px; 
+  color:#333; 
+}
+.form-group input { 
+  padding:10px 12px; 
+  border:1px solid #ccc; 
+  border-radius:8px; 
+  transition:0.3s; 
+}
+.form-group input:focus { 
+  outline:none; 
+  border-color:#007bff; 
+  box-shadow:0 0 5px rgba(0,123,255,0.3); 
+}
+
+/* Elements Section */
+.elements-title { 
+  margin-top:30px; 
+  color:#007bff; 
+  border-bottom:2px solid #007bff; 
+  display:inline-block; 
+  padding-bottom:5px; 
+  margin-bottom:15px; 
+  font-size:20px; 
+  font-weight:600; 
+}
+
+/* Wrapper around header + rows to create the rounded white container seen in the design */
+.elements-wrapper {
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  padding: 18px;
+  background: white;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.03);
+  margin-bottom: 18px;
+}
+
+.elements-inner {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 10px;
+}
+
+/* LOI-compatible class aliases so PO component can reuse LOI-like styles */
+.items-container { /* similar to .elements-wrapper */
+  border-radius: 12px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #e9ecef;
+}
+
+.items-header { /* reuse header style */
+  display: grid;
+  /* updated to 8 columns to include Width (mm) */
+  grid-template-columns: 2.2fr 1fr 1fr 0.9fr 0.9fr 0.8fr 1fr 0.8fr;
+  gap: 14px;
+  padding: 14px 18px;
+  background: #fff;
+  border-radius: 8px;
+  font-weight: 700;
+  color: #495057;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 12px;
+}
+
+.items-header div { text-align: start; }
+
+.item-row { /* reuse element-card but with LOI grid */
+  display: grid;
+  /* updated to 8 columns to include Width (mm) */
+  grid-template-columns: 2.2fr 1fr 1fr 0.9fr 0.9fr 0.8fr 1fr 0.8fr;
+  gap: 14px;
+  align-items: start;
+  padding: 18px 18px;
+  background: #fafbfc;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  transition: all 0.18s ease;
+}
+
+.item-row:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+
+.item-row input, .item-row select { width:100%; padding:12px 5px; border:1px solid #e6e9eb; border-radius:10px; background:white; }
+
+.item-field { display:flex; flex-direction:column; gap:6px; }
+
+.item-row input[type="number"] { width:70px; text-align:center; }
+
+.item-actions { justify-self: end; display:flex; align-items:center; }
+
+/* Button styles matching LOI */
+.btn-danger { background:#dc3545; color:#fff; border:none;margin-top: 6px; padding:6px 7px; border-radius:12px; font-weight:700; box-shadow:0 8px 18px rgba(0,0,0,0.12); }
+.btn-primary { background:#007bff; color:white; border:none; padding:10px 18px; border-radius:8px; font-weight:700; }
+.btn-success { background:#28a745; color:white; border:none; padding:10px 18px; border-radius:8px; font-weight:700; }
+
+/* Header row for element inputs */
+.elements-header {
+  display: grid;
+  /* Use fixed column widths so form inputs line up with table columns in the modal */
+  grid-template-columns: 220px 140px 100px 110px 110px 100px 100px 120px;
+  gap: 14px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 5px;
+  padding: 14px 18px;
+  text-align: start;
+}
+
+.elements-header > div { text-transform: uppercase; font-size:13px; letter-spacing:0.8px; color:#556; }
+
+/* Each element row */
+.element-card {
+  display: grid;
+  /* match the header fixed widths so each input lines up under its label */
+  grid-template-columns: 220px 140px 100px 110px 110px 100px 100px 120px;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f8f9fa;
+  align-items: start;
+  margin-bottom: 14px;
+  transition: 0.25s;
+}
+.element-card:hover { box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+
+.element-card input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  transition: 0.2s;
+  background: white;
+}
+.element-card input:focus {
+  outline:none;
+  border-color:#007bff;
+  box-shadow:0 0 5px rgba(0,123,255,0.2);
+}
+
+/* Action button container */
+.element-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* align the action column to the right edge of the grid cell */
+  justify-self: end;
+}
+.remove-btn {
+  border:none;
+  border-radius:8px;
+  padding:10px 20px;
+  background:#dc3545;
+  color:white;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.3s;
+}
+.remove-btn:hover { background:#a71d2a; }
+
+/* Buttons */
+.add-btn, .submit-btn, .view-btn, .grn-btn {
+  border:none; border-radius:8px; padding:8px 15px; cursor:pointer; font-weight:600; transition:0.3s;
+}
+.add-btn { background:#007bff; color:white; }
+.add-btn:hover { background:#0056b3; }
+.submit-btn { background:#28a745; color:white; width: 300px; margin: auto;}
+.submit-btn:hover { background:#1e7e34; }
+.view-btn { background:#51aebd; color:white; margin-bottom: 5px;}
+.grn-btn { background:#8364bb; color:white; }
+
+/* Form actions row */
+.form-actions { 
+  display:flex; 
+  justify-content:flex-end; 
+  gap:15px; 
+  margin-top:15px; 
+}
+
+/* PO tables */
+.po-table, .po-elements-table { 
+  width:100%; 
+  border-collapse:collapse; 
+  margin-top:10px; 
+  margin-bottom: 20px;
+}
+.po-table th, .po-table td, .po-elements-table th, .po-elements-table td { 
+  border:1px solid #ddd; 
+  padding:8px; 
+  text-align:center; 
+  
+}
+.po-table th, .po-elements-table th { 
+  background:#f4f6f9; 
+}
+.status-received { color:green; font-weight:600; }
+.status-pending { color:orange; font-weight:600; }
+
+/* Modal */
+.modal { 
+  display:flex; 
+  justify-content:center; 
+  align-items:center; 
+  background:rgba(0,0,0,0.6); 
+  position:fixed; 
+  z-index:1000; 
+  top:0; left:0; 
+  width:100%; height:100%; 
+}
+.modal-content { 
+  background:white; 
+  padding:20px; 
+  border-radius:12px; 
+  max-width:900px; 
+  width:90%; 
+  max-height:90%; 
+  overflow-y:auto; 
+  position:relative; 
+}
+.close-btn { 
+  position:absolute; 
+  right:15px; top:10px; 
+  font-size:28px; 
+  cursor:pointer; 
+}
+
+/* GRN Meta Inputs */
+.grn-meta { display:flex; gap:10px; margin-bottom:15px; margin-top: 15px; flex-wrap:wrap; }
+.grn-meta label{font-size: 16px; font-weight:bolder; margin-top: 5px;}
+.grn-meta input { padding:8px 10px; border-radius:5px; border:1px solid #ccc; transition:0.3s; width:350px; }
+.grn-meta input:focus { border-color:#007bff; box-shadow:0 0 5px rgba(0,123,255,0.2); outline:none; }
+
+/* Success Message */
+.success-msg { 
+  color:green; 
+  text-align:center; 
+  margin-top:10px; 
+  font-weight:600; 
+  font-size:16px; 
+}
+
+/* Responsive Adjustments */
+/* For medium screens, allow the grid columns to shrink proportionally instead of creating an extra 'auto' column which broke layout */
+@media (max-width: 1100px) {
+  .element-card, .elements-header { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+  .grn-meta input { width:100%; }
+}
+
+@media(max-width: 900px) {
+  .element-card, .elements-header { grid-template-columns: 1fr; gap:8px; }
+  .element-actions { justify-self:start; margin-top:5px; }
+  .grn-meta { flex-direction:column; gap:8px; }
+  .grn-meta input { width:100%; }
+}
+
+/* Prevent child elements from forcing the grid to overflow its container */
+.elements-header > *, .element-card > * { min-width: 0; box-sizing: border-box; }
+
+input.ng-invalid.ng-touched {
+  border: 1px solid red;
+}
+
+.error-msg {
+  color: red;
+  font-size: 12px;
+}
+
+/* Element field wrapper to stack input + error and keep grid stable */
+.element-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.element-card input,
+.element-card select {
+  padding: 12px 5px;
+  height: 48px;
+  border-radius: 12px;
+}
+
+/* compact numeric boxes */
+.element-card input[type="number"] {
+  width: 88px;
+  text-align: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Target the width and length inputs inside element rows (name attributes are steelWidth0, steelWidth1, etc.) */
+.element-card input[name^="steelWidth"],
+.element-card input[name^="length"] {
+  width: 110px; /* matches the grid column for Width/Length */
+  text-align: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Align corresponding table columns in PO modal to the same widths and center numeric values */
+.po-elements-table th:nth-child(4), .po-elements-table td:nth-child(4),
+.po-elements-table th:nth-child(5), .po-elements-table td:nth-child(5) {
+  width: 110px;
+  text-align: center;
+}
+
+.po-elements-table th:nth-child(6), .po-elements-table td:nth-child(6) {
+  width: 100px;
+  text-align: center;
+}
+
+/* Make material/grade/section columns a bit wider in the table to match the form */
+.po-elements-table th:nth-child(1), .po-elements-table td:nth-child(1) { width:120px; text-align:left; }
+.po-elements-table th:nth-child(2), .po-elements-table td:nth-child(2) { width:100px; }
+.po-elements-table th:nth-child(3), .po-elements-table td:nth-child(3) { width:100px; }
+
+/* Ensure table layout doesn't collapse columns unexpectedly */
+.po-elements-table { table-layout: fixed; }
+
+/* Make the Remove button more prominent inside PO forms (scoped) */
+.po-container .remove-btn {
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+  border: 0;
+}
+
+@media(max-width: 900px) {
+  .element-card, .elements-header { grid-template-columns: 1fr; }
+}
+
+/* Responsive rules for the Elements / Items section (tablet & mobile) */
+@media (max-width: 1024px) {
+  .items-header { display: none !important; }
+
+  .item-row {
+    display: block;
+    padding: 14px;
+    background: #fff;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  }
+
+  /* Stack label above control for readability */
+  .element-field, .item-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .element-field[data-label]:before, .item-field[data-label]:before {
+    content: attr(data-label);
+    display: block;
+    color: #495057;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .element-field input, .element-field select, .item-field input, .item-field select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .item-row input[type="number"], .element-card input[type="number"] {
+    width: 100%;
+    text-align: left;
+  }
+
+  .item-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .item-actions button, .remove-btn { width: 140px; }
+}
+
+@media (max-width: 420px) {
+  .element-field[data-label]:before, .item-field[data-label]:before { font-size: 12px; }
+  .element-field input, .element-field select, .item-field input, .item-field select { font-size: 14px; }
+  .item-actions button, .remove-btn { width: 100%; }
+  .form-actions { flex-direction: column; gap: 10px; align-items: stretch; }
+  .submit-btn { width: 100%; }
+}
+
+/* Allow horizontal scrolling for PO tables on tablet & phones so all columns remain visible */
+@media (max-width: 1024px) {
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-responsive table, .po-table, .po-elements-table { min-width: max-content; width: 100%; }
+}
+
+/* Mobile/tablet specific: make PO elements table (GRN/update quantities) readable */
+@media (max-width: 1024px) {
+  .po-elements-table thead { display: none; }
+
+  .po-elements-table tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 1px solid #eef1f4;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .po-elements-table td {
+    display: block;
+    padding: 8px 6px;
+    border: none;
+    text-align: left;
+    background: transparent;
+  }
+
+  /* label above control */
+  .po-elements-table td[data-label]:before {
+    content: attr(data-label);
+    display: block;
+    font-weight: 700;
+    color: #495057;
+    margin-bottom: 6px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .po-elements-table td > * {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .po-elements-table input, .po-elements-table select, .po-elements-table textarea {
+    width: 100% !important;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #fff;
+  }
+
+  /* Make numeric boxes full width and readable */
+  .po-elements-table input[type="number"] { text-align: left; }
+
+  /* Actions row: buttons stacked and full width on small screens */
+  .po-elements-table td[data-label="Actions"] {
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+  }
+  .po-elements-table td[data-label="Actions"] .approve-btn,
+  .po-elements-table td[data-label="Actions"] .reject-btn,
+  .po-elements-table td[data-label="Actions"] .remove-btn {
+    width: 100%;
+  }
+}
+
+/* --- Filter Section (match jobwork layout) --- */
+.filter-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f4f6f9;
+  border-radius: 10px;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.filter-input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  flex: 1;
+  min-width: 150px;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #6f42c1;
+  box-shadow: 0 0 5px rgba(111, 66, 193, 0.2);
+}
+
+.btn-filter {
+  background: #6c757d;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-filter:hover {
+  background: #545b62;
+}
+
+/* Align Received and Remarks columns in GRN modal table and ensure inputs fit the cells */
+.po-elements-table th:nth-child(7), .po-elements-table td:nth-child(7) {
+  width: 100px; /* Received numeric input width */
+  text-align: center;
+}
+.po-elements-table th:nth-child(8), .po-elements-table td:nth-child(8) {
+  width: 100px; /* Remarks should be wider for text */
+  text-align: left;
+}
+
+/* Inputs inside the po-elements-table should fill the cell without overflowing */
+.po-elements-table td input[type="number"],
+.po-elements-table td input[type="text"],
+.po-elements-table td select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+}
+
+/* Reduce number input width inside table to keep alignment consistent on small screens */
+.po-elements-table td input[type="number"] {
+  text-align: center;
+}
+
+/* Ensure table can scroll horizontally on very small screens instead of breaking layout */
+.modal-content { overflow-x: auto; }
+
+/* Note: responsive helpers moved to global stylesheet src/styles/responsive.css */

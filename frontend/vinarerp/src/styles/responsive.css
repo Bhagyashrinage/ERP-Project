@@ -1,0 +1,62 @@
+/* Centralized responsive rules for vinarerp
+   - Keep desktop styles unchanged
+   - Tablet (<= 992px) tweaks and Mobile (<= 768px) stacked/card rules
+   - Includes stacked-card converter for tables that include data-label attributes (used for packing table)
+*/
+
+/* Tablet adjustments */
+@media (max-width: 991.98px) {
+  .table-sm { font-size: 0.82rem; }
+  .table-sm th, .table-sm td { padding: 0.25rem 0.45rem; }
+  .modal-dialog, .modal-dialog-centered { max-width: 90%; }
+  /* Allow form rows and grid wrappers to breathe */
+  .form-row, .d-flex.flex-wrap, .grn-header, .items-header, .element-card, .item-row { gap: 0.6rem; }
+  .btn { white-space: normal; }
+}
+
+/* Mobile: stacked/card style for tables that provide data-label attributes */
+@media (max-width: 767.98px) {
+  /* Base adjustments */
+  .table-sm { font-size: 0.76rem; }
+  .table-sm th, .table-sm td { padding: 0.22rem 0.35rem; white-space: normal; }
+  .d-flex.justify-content-between.mb-3 { flex-direction: column; gap: 0.5rem; }
+  .btn.btn-sm, .btn { display:block; width:100%; margin-bottom:0.45rem; }
+  .modal-dialog, .modal-dialog-centered { max-width: 98%; margin: 0.35rem auto; }
+
+  /* Collapse grid-based item rows into single column */
+  .element-card, .elements-header, .items-header, .item-row { display:block !important; grid-template-columns: 1fr !important; }
+  .form-row { display:block; }
+  .form-row .form-group, .form-group { width:100%; }
+
+  /* Stacked table rows using data-label attribute on TDs.
+     To use: ensure each <td> has a matching data-label attribute equal to its header text.
+     This keeps desktop tables intact and converts to readable blocks on mobile. */
+  .card .table, .table-responsive .table {
+    border-collapse: separate;
+  }
+
+  .card .table thead { display: none; }
+  .card .table tbody tr { display: block; margin-bottom: 0.75rem; border: 1px solid rgba(0,0,0,0.06); border-radius: 8px; padding: 0.5rem; background: #fff; }
+  .card .table tbody td { display: block; text-align: left; padding: 6px 10px; border: none; }
+  .card .table tbody td::before { content: attr(data-label) ": "; font-weight: 700; margin-right: 6px; color: #333; display: inline-block; width: 45%; }
+  .card .table tbody td span.badge, .card .table tbody td .btn { display: inline-block; width: auto; }
+
+  /* Keep important columns visually prominent: allow overriding by component with classes */
+  .table-priority { font-weight: 700; }
+
+  /* Make action buttons easier to tap */
+  .card .table tbody td .btn { display:block; width:100%; margin-top:6px; }
+
+  /* If a table should remain horizontally scrollable instead of stacking, add class .no-stack */
+  .no-stack thead { display: table-header-group !important; }
+  .no-stack tbody tr { display: table-row !important; }
+  .no-stack tbody td { display: table-cell !important; }
+}
+
+/* Small helper: prevent overflow from long inputs inside grids */
+.elements-header > *, .element-card > *, .item-row > * { min-width: 0; box-sizing: border-box; }
+
+/* Safety: ensure modals can scroll on very small screens */
+@media (max-width: 420px) {
+  .modal-content { max-height: 92vh; overflow-y: auto; }
+}

@@ -1,0 +1,346 @@
+<div class="tabs-container">
+  <button [class.active]="activeTab === 'issue'" (click)="switchTab('issue')">Issue Material</button>
+  <button [class.active]="activeTab === 'receive'" (click)="switchTab('receive')">Receive Material</button>
+  <button [class.active]="activeTab === 'list'" (click)="switchTab('list')">Challan List</button>
+  <button [class.active]="activeTab === 'invoices'" (click)="switchTab('invoices')">Receipts / Invoices</button>
+</div>
+
+<!-- ================= ISSUE MATERIAL ================= -->
+<div *ngIf="activeTab === 'issue'" class="jobwork-container">
+  <h2 class="jobwork-title">Issue Material</h2>
+
+  <form (ngSubmit)="issueChallanSubmit()" #issueForm="ngForm">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Challan No <span class="required">*</span></label>
+  <input name="challanNo" required type="text" pattern="^[0-9]+$" [(ngModel)]="issueChallan.challanNo" #challanNoModel="ngModel" (keypress)="allowOnlyNumbers($event)" (input)="onChallanNoInput($event)" (paste)="onPasteNumbers($event)" />
+        <small class="error-msg" *ngIf="challanNoModel.invalid && (challanNoModel.touched || challanNoModel.dirty)">Challan No is required.</small>
+      </div>
+      <div class="form-group">
+        <label>Challan Date <span class="required">*</span></label>
+        <input name="challanDate" required type="date" [(ngModel)]="issueChallan.challanDate" #challanDateModel="ngModel" />
+        <small class="error-msg" *ngIf="challanDateModel.invalid && (challanDateModel.touched || challanDateModel.dirty)">Challan Date is required.</small>
+      </div>
+      <div class="form-group">
+        <label>Receiver <span class="required">*</span></label>
+  <input name="receiver" required type="text" pattern="^[A-Za-z ]+$" [(ngModel)]="issueChallan.supplier" #receiverModel="ngModel" (keypress)="allowOnlyLetters($event)" (input)="onReceiverInput($event)" (paste)="onPasteLetters($event)" />
+        <small class="error-msg" *ngIf="receiverModel.invalid && (receiverModel.touched || receiverModel.dirty)">Receiver is required (letters, numbers, - / allowed).</small>
+      </div>
+      <div class="form-group">
+        <label>Vehicle No</label>
+  <input name="vehicleNo" type="text" pattern="^[A-Za-z0-9- ]*$" [(ngModel)]="issueChallan.vehicleNo" #vehicleModel="ngModel" (keypress)="allowAlphaNumeric($event)" (input)="onVehicleInput($event)" (paste)="onPasteAlphaNumeric($event)" />
+        <small class="error-msg" *ngIf="vehicleModel.invalid && (vehicleModel.touched || vehicleModel.dirty)">Invalid vehicle number.</small>
+      </div>
+    </div>
+
+  <h3 class="elements-title">Material Lines</h3>
+  <div class="elements-responsive">
+    <div class="elements-header">
+      <div class="header-item">Item Code</div>
+      <div class="header-item">Description</div>
+      <div class="header-item">Qty Issued</div>
+      <div class="header-item">Weight</div>
+      <div class="header-item">UOM</div>
+      <div class="header-item">Remarks</div>
+      <div class="header-item">Action</div>
+    </div>
+
+    <div *ngFor="let line of issueChallan.lines; let i = index" class="element-card-jw">
+      <div class="line-field" data-label="Item Code">
+        <input name="itemCode{{i}}" required type="text" [(ngModel)]="line.itemCode" #itemCodeModel="ngModel" placeholder="Item Code" />
+        <small class="inline-error" *ngIf="itemCodeModel.invalid && (itemCodeModel.touched || itemCodeModel.dirty)">Item code is required.</small>
+      </div>
+
+      <div class="line-field" data-label="Description">
+        <input name="description{{i}}" required type="text" [(ngModel)]="line.description" #descModel="ngModel" placeholder="Description" />
+        <small class="inline-error" *ngIf="descModel.invalid && (descModel.touched || descModel.dirty)">Description is required.</small>
+      </div>
+
+      <div class="line-field" data-label="Qty Issued">
+        <input name="qtyIssued{{i}}" required type="number" min="1" [(ngModel)]="line.qtyIssued" #qtyModel="ngModel" placeholder="Qty Issued" />
+        <small class="inline-error" *ngIf="qtyModel.invalid && (qtyModel.touched || qtyModel.dirty)">Enter a valid issued quantity (&gt;=1).</small>
+      </div>
+
+      <div class="line-field" data-label="Weight">
+        <input name="weight{{i}}" required type="number" min="0" step="0.001" [(ngModel)]="line.weight" #wtModel="ngModel" placeholder="Weight" />
+        <small class="inline-error" *ngIf="wtModel.invalid && (wtModel.touched || wtModel.dirty)">Enter a valid weight.</small>
+      </div>
+
+      <div class="line-field" data-label="UOM">
+        <select name="uom{{i}}" required [(ngModel)]="line.uom" #uomModel="ngModel">
+          <option value="">--Select--</option>
+          <option value="MT">MT</option>
+          <option value="KG">KG</option>
+        </select>
+        <small class="inline-error" *ngIf="uomModel.invalid && (uomModel.touched || uomModel.dirty)">Unit is required.</small>
+      </div>
+
+      <div class="line-field" data-label="Remarks">
+        <input name="remarks{{i}}" type="text" [(ngModel)]="line.remarks" />
+      </div>
+
+      <div class="line-field" data-label="Action">
+        <button class="remove-btn" (click)="removeIssueLine(i)">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="jump-align-right">
+    <button class="add-btn" (click)="addIssueLine()">Add Line</button>
+  </div>
+
+  <div class="summary-row">
+    Total Qty: {{ getTotalIssuedQty() }}, Total Weight: {{ getTotalIssuedWeight() }}
+  </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-btn" [disabled]="issueForm.invalid">Submit</button>
+    </div>
+
+  </form>
+
+  <div *ngIf="message" class="success-msg">{{ message }}</div>
+</div>
+
+<!-- ================= RECEIVE MATERIAL ================= -->
+<div *ngIf="activeTab === 'receive'" class="jobwork-container">
+  <h2 class="jobwork-title">Receive Material</h2>
+
+  <form (ngSubmit)="recordReceipt()" #recForm="ngForm">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Challan No <span class="required">*</span></label>
+  <select name="challanSelect" required [(ngModel)]="receiptForm.challanNo" (change)="onChallanSelect(receiptForm.challanNo)" #challanSelectModel="ngModel">
+          <option value="">-- Select Challan --</option>
+          <option *ngFor="let challan of challans" [value]="challan.challanNo">
+            {{ challan.challanNo }} ({{ challan.supplier }})
+          </option>
+        </select>
+        <small class="error-msg" *ngIf="challanSelectModel.invalid && (challanSelectModel.touched || challanSelectModel.dirty)">Select a challan.</small>
+      </div>
+
+      <div class="form-group">
+        <label>Receipt Date <span class="required">*</span></label>
+        <input name="receiptDate" required type="date" [(ngModel)]="receiptForm.receiptDate" #receiptDateModel="ngModel" />
+        <small class="error-msg" *ngIf="receiptDateModel.invalid && (receiptDateModel.touched || receiptDateModel.dirty)">Receipt date is required.</small>
+      </div>
+      <div class="form-group">
+        <label>Supplier Name <span class="required">*</span></label>
+  <input name="recName" required type="text" pattern="^[A-Za-z ]+$" [(ngModel)]="receiptForm.receiverName" #recNameModel="ngModel" (input)="onReceiptReceiverInput($event)" (paste)="onPasteLetters($event)" />
+        <small class="error-msg" *ngIf="recNameModel.invalid && (recNameModel.touched || recNameModel.dirty)">Receiver name is required.</small>
+      </div>
+      <div class="form-group">
+        <label>Qty Received <span class="required">*</span></label>
+        <input name="qtyReceived" required type="number" min="1" [(ngModel)]="receiptForm.qtyReceived" #qtyRecModel="ngModel" />
+        <small class="error-msg" *ngIf="qtyRecModel.invalid && (qtyRecModel.touched || qtyRecModel.dirty)">Enter a valid received quantity (&gt;=1).</small>
+      </div>
+      <div class="form-group">
+        <label>Actual Weight</label>
+        <input name="actualWeight" type="number" min="0" step="0.001" [(ngModel)]="receiptForm.actualWeight" (input)="updateDifference()" #actualW="ngModel" />
+      </div>
+      <div class="form-group">
+        <label>Kata Weight</label>
+        <input name="kataWeight" type="number" min="0" step="0.001" [(ngModel)]="receiptForm.kataWeight" (input)="updateDifference()" #kataW="ngModel" />
+      </div>
+      <div class="form-group">
+        <label>Difference</label>
+        <input type="text"  [value]="receiptForm.difference" readonly />
+      </div>
+      <div class="form-group" >
+        <label>Penalty / Bonus</label>
+        <input type="text" style="width: 405px;" [value]="differenceMessage" readonly />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-btn" [disabled]="recForm.invalid">Record Receipt</button>
+    </div>
+  </form>
+
+  <div *ngIf="message" class="success-msg">{{ message }}</div>
+</div>
+
+<!-- ================= CHALLAN LIST ================= -->
+<div *ngIf="activeTab === 'list'" class="jobwork-list-container">
+  <h2 class="jobwork-title">Challan List</h2>
+
+  <div class="filter-section">
+    <div class="filter-row">
+  <input type="text" placeholder="Search Challan No" class="filter-input" [(ngModel)]="searchChallanNo" (input)="applyReceiptFilters()" />
+            <select class="filter-input" [(ngModel)]="filterStatus" (change)="applyFilters()">
+        <option value="">All Status</option>
+        <option value="ISSUED">ISSUED</option>
+        <option value="PENDING_RETURN">PENDING RETURN</option>
+        <option value="RETURNED">RETURNED</option>
+        <option value="COMPLETED">COMPLETED</option>
+      </select>
+      <button class="btn-filter" (click)="applyFilters()">Apply Filter</button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="jobwork-table">
+      <thead>
+        <tr>
+          <th>Challan No</th>
+          <th>Date</th>
+          <th>Receiver</th>
+          <th>Vehicle</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let challan of displayedChallans">
+          <td data-label="Challan No">{{ challan.challanNo }}</td>
+          <td data-label="Date">{{ challan.challanDate }}</td>
+          <td data-label="Receiver">{{ challan.supplier }}</td>
+          <td data-label="Vehicle">{{ challan.vehicleNo || '-' }}</td>
+          <td data-label="Status">
+            <span [ngClass]="'status-' + challan.status.toLowerCase()">{{ challan.status }}</span>
+          </td>
+          <td data-label="Action">
+            <div class="item-actions">
+              <button class="view-btn" (click)="openDetailModal(challan)">View</button>
+              <button class="delete-btn" (click)="deleteChallan(challan.id)">Delete</button>
+              <button class="print-btn" (click)="printChallan(challan)">Print</button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="filteredChallans.length === 0">
+          <td colspan="6" class="no-data">No data found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- Pagination for challans -->
+  <div *ngIf="filteredChallans.length" class="pagination-container">
+    <div class="pagination-info">Showing {{ ((challanCurrentPage-1)*challanPageSize)+1 }} - {{ Math.min(challanCurrentPage*challanPageSize, filteredChallans.length) }} of {{ filteredChallans.length }}</div>
+    <div class="pagination-controls">
+      <button class="pg-btn" (click)="changeChallanPage(challanCurrentPage-1)" [disabled]="challanCurrentPage===1">◀ Prev</button>
+      <button *ngFor="let p of [].constructor(challanTotalPages); let i = index" class="pg-btn" [class.active]="challanCurrentPage === (i+1)" (click)="changeChallanPage(i+1)">{{ i+1 }}</button>
+      <button class="pg-btn" (click)="changeChallanPage(challanCurrentPage+1)" [disabled]="challanCurrentPage===challanTotalPages">Next ▶</button>
+    </div>
+    <div class="pagination-size">
+      <label>Rows:</label>
+      <select (change)="setChallanPageSize(+$any($event.target).value)" [value]="challanPageSize">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ================= RECEIPTS / INVOICES ================= -->
+<div *ngIf="activeTab === 'invoices'" class="jobwork-list-container">
+  <h2 class="jobwork-title">Receipts / Invoices</h2>
+
+  <div class="filter-section">
+    <div class="filter-row">
+      <input type="text" placeholder="Search Challan No" class="filter-input" [(ngModel)]="searchChallanNo" (input)="applyFilters()" />
+      <select class="filter-input" [(ngModel)]="filterReceiptStatus" (change)="applyReceiptFilters()">
+        <option value="">All Status</option>
+        <option value="PENDING">PENDING</option>
+        <option value="APPROVED">APPROVED</option>
+        <option value="REJECTED">REJECTED</option>
+      </select>
+  <button class="btn-filter" (click)="applyReceiptFilters()">Apply Filter</button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="invoice-table">
+      <thead>
+        <tr>
+          <th>Challan No</th>
+          <th>Receipt Date</th>
+          <th>Receiver Name</th>
+          <th>Qty Received</th>
+          <th>Actual Weight</th>
+          <th>Kata Weight</th>
+          <th>Difference</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let receipt of displayedReceipts">
+          <td data-label="Challan No">{{ receipt.challanNo }}</td>
+          <td data-label="Receipt Date">{{ receipt.receiptDate }}</td>
+          <td data-label="Receiver Name">{{ receipt.receiverName }}</td>
+          <td data-label="Qty Received">{{ receipt.qtyReceived }}</td>
+          <td data-label="Actual Weight">{{ receipt.actualWeight }}</td>
+          <td data-label="Kata Weight">{{ receipt.kataWeight }}</td>
+          <td data-label="Difference" [ngClass]="{'difference-positive': receipt.difference > 0, 'difference-negative': receipt.difference < 0}">
+            {{ getPenaltyOrBonus(receipt) }}
+          </td>
+          <td data-label="Status">
+            <span [ngClass]="'status-' + receipt.status.toLowerCase()">{{ receipt.status }}</span>
+          </td>
+          <td data-label="Actions" class="invoice-action-buttons">
+            <div class="item-actions">
+              <button class="approve-btn" (click)="approveReceipt(receipt.id)">Approve</button>
+              <button class="reject-btn" (click)="rejectReceipt(receipt.id)">Reject</button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="filteredReceipts.length === 0">
+          <td colspan="9" class="no-data">No data found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- Pagination for receipts/invoices -->
+  <div *ngIf="filteredReceipts.length" class="pagination-container">
+    <div class="pagination-info">Showing {{ ((receiptCurrentPage-1)*receiptPageSize)+1 }} - {{ Math.min(receiptCurrentPage*receiptPageSize, filteredReceipts.length) }} of {{ filteredReceipts.length }}</div>
+    <div class="pagination-controls">
+      <button class="pg-btn" (click)="changeReceiptPage(receiptCurrentPage-1)" [disabled]="receiptCurrentPage===1">◀ Prev</button>
+      <button *ngFor="let p of [].constructor(receiptTotalPages); let i = index" class="pg-btn" [class.active]="receiptCurrentPage === (i+1)" (click)="changeReceiptPage(i+1)">{{ i+1 }}</button>
+      <button class="pg-btn" (click)="changeReceiptPage(receiptCurrentPage+1)" [disabled]="receiptCurrentPage===receiptTotalPages">Next ▶</button>
+    </div>
+    <div class="pagination-size">
+      <label>Rows:</label>
+      <select (change)="setReceiptPageSize(+$any($event.target).value)" [value]="receiptPageSize">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ================= DETAIL MODAL ================= -->
+<div class="modal" *ngIf="showDetailModal">
+  <div class="modal-content">
+    <span class="close-btn" (click)="closeDetailModal()">&times;</span>
+    <h3>Challan Details - {{ selectedChallan?.challanNo }}</h3>
+
+    <div class="table-responsive">
+      <table class="detail-table">
+        <thead>
+          <tr>
+            <th>Item Code</th>
+            <th>Description</th>
+            <th>Qty Issued</th>
+            <th>Weight</th>
+            <th>UOM</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let line of selectedChallan?.lines">
+            <td data-label="Item Code">{{ line.itemCode }}</td>
+            <td data-label="Description">{{ line.description }}</td>
+            <td data-label="Qty Issued">{{ line.qtyIssued }}</td>
+            <td data-label="Weight">{{ line.weight }}</td>
+            <td data-label="UOM">{{ line.uom }}</td>
+            <td data-label="Remarks">{{ line.remarks || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,913 @@
+/* --- Tabs --- */
+.tabs-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 30px 0;
+  gap: 10px;
+}
+
+.tabs-container button {
+  background: #f1f1f1;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+  font-size: 14px;
+}
+
+.tabs-container button:hover {
+  background: #e0e0e0;
+}
+
+.tabs-container button.active {
+  background: #6f42c1;
+  color: white;
+  box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+}
+
+/* --- Containers --- */
+.jobwork-container,
+.jobwork-list-container {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  background: #fff;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: 0.3s;
+}
+
+.jobwork-container:hover,
+.jobwork-list-container:hover {
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+.jobwork-title {
+  text-align: center;
+  color: #6f42c1;
+  margin-bottom: 25px;
+  font-size: 28px;
+}
+
+/* --- Form Rows --- */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  flex: 2;
+  min-width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full-width {
+  flex: 0 0 100%;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: 0.3s;
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #6f42c1;
+  box-shadow: 0 0 5px rgba(111, 66, 193, 0.3);
+}
+
+.required {
+  color: red;
+  margin-left: 4px;
+}
+
+/* --- Elements Section --- */
+.elements-title {
+  margin-top: 30px;
+  color: #6f42c1;
+  border-bottom: 2px solid #6f42c1;
+  display: inline-block;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.elements-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 5px;
+  text-align: start;
+  padding: 10px;
+  background: #f4f6f9;
+  border-radius: 8px;
+}
+
+.element-card-jw {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f8f9fa;
+  align-items: start;
+  margin-bottom: 12px;
+  transition: 0.3s;
+}
+
+.element-card-jw:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.element-card-jw input,
+.element-card-jw select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  transition: 0.3s;
+}
+
+.element-card-jw input {
+  height: 40px;
+}
+
+.element-card-jw {
+  grid-auto-rows: minmax(48px, auto);
+}
+
+.element-card-jw input:focus,
+.element-card-jw select:focus {
+  outline: none;
+  border-color: #6f42c1;
+  box-shadow: 0 0 5px rgba(111, 66, 193, 0.2);
+}
+
+.remove-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  background: #dc3545;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.remove-btn:hover {
+  background: #a71d2a;
+}
+
+/* --- Summary Row --- */
+.summary-row {
+  padding: 12px;
+  background: #e7f3ff;
+  border-left: 4px solid #6f42c1;
+  border-radius: 6px;
+  margin: 15px 0;
+  color: #333;
+  font-weight: 600;
+}
+
+/* --- Weight Section --- */
+.weight-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.weight-card {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+}
+
+.weight-card.highlight {
+  background: #fff3cd;
+  border-color: #ffc107;
+}
+
+.weight-card label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.weight-card input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.weight-card input:focus {
+  outline: none;
+  border-color: #6f42c1;
+  box-shadow: 0 0 5px rgba(111, 66, 193, 0.2);
+}
+
+/* --- Buttons --- */
+.add-btn,
+.submit-btn,
+.view-btn,
+.print-btn,
+.delete-btn,
+.approve-btn,
+.reject-btn,
+.btn-filter {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 15px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+  margin: 2px;
+}
+
+.add-btn {
+  background: #6f42c1;
+  color: white;
+}
+
+.add-btn:hover {
+  background: #5a2d9c;
+}
+
+.submit-btn {
+  background: #28a745;
+  color: white;
+}
+
+.submit-btn:hover {
+  background: #1e7e34;
+}
+
+.submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.view-btn {
+  background: #17a2b8;
+  color: white;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.view-btn:hover {
+  background: #117a8b;
+}
+
+.print-btn {
+  background: #fd7e14;
+  color: white;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.print-btn:hover {
+  background: #e56a00;
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.delete-btn:hover {
+  background: #a71d2a;
+}
+
+.approve-btn {
+  background: linear-gradient(135deg, #28a745, #5dd879);
+  color: #fff;
+  padding: 7px 14px;
+  font-size: 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(40, 167, 69, 0.35);
+  transition: all 0.25s ease;
+}
+
+.approve-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(40, 167, 69, 0.45);
+}
+
+.reject-btn {
+  background: linear-gradient(135deg, #dc3545, #ff6b6b);
+  color: #fff;
+  padding: 7px 14px;
+  font-size: 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(220, 53, 69, 0.35);
+  transition: all 0.25s ease;
+}
+
+.reject-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(220, 53, 69, 0.45);
+}
+
+.btn-filter {
+  background: #6c757d;
+  color: white;
+  padding: 8px 12px;
+}
+
+.btn-filter:hover {
+  background: #545b62;
+}
+
+/* --- Form Actions --- */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* --- Filter Section --- */
+.filter-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f4f6f9;
+  border-radius: 10px;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.filter-input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  flex: 1;
+  min-width: 150px;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #6f42c1;
+  box-shadow: 0 0 5px rgba(111, 66, 193, 0.2);
+}
+
+/* --- Tables --- */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.jobwork-table,
+.invoice-table,
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.jobwork-table th,
+.jobwork-table td,
+.invoice-table th,
+.invoice-table td,
+.detail-table th,
+.detail-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+}
+
+.jobwork-table th,
+.invoice-table th,
+.detail-table th {
+  background: #f4f6f9;
+  font-weight: 600;
+  color: #333;
+}
+
+.jobwork-table tr:hover,
+.invoice-table tr:hover {
+  background: #f9f9f9;
+}
+
+/* --- Status Badges --- */
+.status-issued {
+  color: #17a2b8;
+  font-weight: 600;
+  background: #d1ecf1;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.status-pending {
+  color: #ff6b6b;
+  font-weight: 600;
+  background: #ffe0e0;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.status-returned {
+  color: #28a745;
+  font-weight: 600;
+  background: #d4edda;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.status-completed {
+  color: #007bff;
+  font-weight: 600;
+  background: #cfe2ff;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.status-approved {
+  color: #28a745;
+  font-weight: 600;
+  background: #d4edda;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.status-rejected {
+  color: #dc3545;
+  font-weight: 600;
+  background: #f8d7da;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* --- Difference Colors --- */
+.difference-positive {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.difference-negative {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.penalty-color {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.bonus-color {
+  color: #28a745;
+  font-weight: 600;
+}
+
+/* --- Messages --- */
+.success-msg {
+  color: #155724;
+  text-align: center;
+  margin-top: 15px;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 10px;
+  background: #d4edda;
+  border-radius: 6px;
+}
+
+.error-msg {
+  color: #721c24;
+  text-align: center;
+  margin: 15px 0;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px;
+  background: #f8d7da;
+  border-radius: 6px;
+}
+
+/* Smaller inline errors for inputs inside element rows */
+.inline-error {
+  color: #8b1f24;
+  text-align: left;
+  margin: 4px 0 0 0;
+  font-weight: 500;
+  font-size: 12px;
+  padding: 0;
+  background: transparent;
+  line-height: 1.1;
+}
+
+.line-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.no-data {
+  text-align: center;
+  padding: 30px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* --- Modal --- */
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 1000px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.close-btn {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  font-size: 28px;
+  cursor: pointer;
+  color: #999;
+  transition: 0.3s;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.modal-content h3 {
+  color: #6f42c1;
+  margin-bottom: 15px;
+}
+
+.modal-header {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.modal-header p {
+  margin: 8px 0;
+}
+
+.modal-content h4 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* --- Responsive --- */
+@media (max-width: 900px) {
+  .elements-header,
+  .element-card-jw {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .weight-section {
+    grid-template-columns: 1fr;
+  }
+
+  .jobwork-table,
+  .invoice-table {
+    font-size: 12px;
+  }
+
+  .jobwork-table th,
+  .jobwork-table td,
+  .invoice-table th,
+  .invoice-table td {
+    padding: 8px;
+  }
+}
+
+/* Hide the header band on tablet and smaller so labels don't repeat above each card */
+@media (max-width: 900px) {
+  .elements-responsive .elements-header {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .tabs-container {
+    flex-direction: column;
+  }
+
+  .tabs-container button {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  /* Keep element rows as columns but allow horizontal scroll on small screens
+     so labels stay aligned with inputs instead of stacking vertically. */
+  .elements-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 10px;
+  }
+
+  .elements-responsive .elements-header {
+    grid-template-columns: 1fr; /* collapse header into single column list on narrow widths */
+    gap: 0;
+    padding: 8px;
+  }
+
+  .elements-responsive .elements-header .header-item {
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+
+  .element-card-jw {
+    grid-template-columns: 1fr; /* stack fields */
+    padding: 8px;
+  }
+
+  .element-card-jw .line-field:before {
+    content: attr(data-label);
+    display: block;
+    color: #6f42c1; /* purple label color */
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+  }
+
+  .element-card-jw .line-field {
+    width: 100%;
+    padding: 8px 0;
+  }
+
+  .element-card-jw .remove-btn {
+    align-self: flex-start;
+  }
+
+  .remove-btn {
+    justify-self: start;
+    margin-top: 5px;
+  }
+
+  .filter-row {
+    flex-direction: column;
+  }
+
+  .filter-input {
+    width: 100%;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-group {
+    min-width: unset;
+  }
+
+  .jobwork-container,
+  .jobwork-list-container {
+    padding: 15px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+
+  .invoice-table,
+  .jobwork-table,
+  .detail-table {
+    min-width: 800px;
+  }
+
+  /* Make each input block look like the Receive Material layout: label above input, full width */
+  .elements-responsive .element-card-jw {
+    grid-template-columns: 1fr; /* stack cards vertically on very small screens */
+    gap: 12px;
+  }
+
+  .elements-responsive .element-card-jw .line-field {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 6px 0;
+  }
+
+  .elements-responsive .element-card-jw .line-field:before {
+    content: attr(data-label);
+    display: block;
+    font-weight: 600;
+    color: #563d7c; /* purple-ish similar to headings */
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+    text-transform: none;
+  }
+
+  .elements-responsive .element-card-jw .line-field input,
+  .elements-responsive .element-card-jw .line-field select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Small adjustments for the remove button to align with inputs */
+  .elements-responsive .element-card-jw .remove-btn {
+    align-self: flex-start;
+  }
+}
+
+/* --- Jump Align Right --- */
+.jump-align-right {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+/* --- Approved / Rejected Labels --- */
+.status-label {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: default;
+}
+
+.approved-label {
+  background: #d4edda;
+  color: #155724;
+}
+
+.rejected-label {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* --- Invoice Action Buttons --- */
+.invoice-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Material Lines header (column names) */
+.elements-responsive .elements-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 90px;
+  gap: 12px;
+  background: #f5f7fa; /* light gray band */
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  color: #333;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.elements-responsive .elements-header .header-item {
+  padding: 6px 8px;
+}
+
+/* Material line card styling */
+.element-card-jw {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 90px;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.element-card-jw .line-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.element-card-jw .line-field input,
+.element-card-jw .line-field select {
+  border: 1px solid #e6e6e6;
+  padding: 8px 10px;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.95rem;
+}
+
+.element-card-jw .line-field small.inline-error {
+  color: #d9534f;
+  margin-top: 6px;
+  font-size: 0.85rem;
+}
+
+.element-card-jw .remove-btn {
+  background: #d9534f;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Mobile: show label above input (purple), stack fields vertically and keep inputs full width) */
+@media (max-width: 600px) {
+  .elements-responsive .elements-header {
+    grid-template-columns: 1fr; /* collapse header into single column list on narrow widths */
+    gap: 0;
+    padding: 8px;
+  }
+
+  .elements-responsive .elements-header .header-item {
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+
+  .element-card-jw {
+    grid-template-columns: 1fr; /* stack fields */
+    padding: 8px;
+  }
+
+  .element-card-jw .line-field:before {
+    content: attr(data-label);
+    display: block;
+    color: #6f42c1; /* purple label color */
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+  }
+
+  .element-card-jw .line-field {
+    width: 100%;
+    padding: 8px 0;
+  }
+
+  .element-card-jw .remove-btn {
+    align-self: flex-start;
+  }
+}
+
+/* Strong override: hide the elements header on tablet and mobile to avoid duplicate labels
+   placed at the end so it wins over earlier rules. This only affects widths <= 900px. */
+@media (max-width: 900px) {
+  .elements-responsive .elements-header {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+}
